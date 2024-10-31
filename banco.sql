@@ -1,5 +1,5 @@
 CREATE TABLE Item (
-    id SERIAL PRIMARY KEY,
+    idItem SERIAL PRIMARY KEY,
     nome VARCHAR(50) NOT NULL,
     tipo VARCHAR(20) NOT NULL,
     preco DECIMAL(10, 2) NOT NULL
@@ -7,7 +7,7 @@ CREATE TABLE Item (
 
 -- Tabela para as comandas
 CREATE TABLE Comanda (
-    id SERIAL PRIMARY KEY,
+    idComanda SERIAL PRIMARY KEY,
     data_abertura TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     data_fechamento TIMESTAMP,
     status VARCHAR(20) NOT NULL DEFAULT 'aberta'
@@ -15,7 +15,7 @@ CREATE TABLE Comanda (
 
 -- Tabela para os pedidos de itens nas comandas
 CREATE TABLE Pedido (
-    id SERIAL PRIMARY KEY,
+    idPedido SERIAL PRIMARY KEY,
     comanda_id INT REFERENCES Comanda(id),
     item_id INT REFERENCES Item(id),
     quantidade INT NOT NULL,
@@ -24,7 +24,7 @@ CREATE TABLE Pedido (
 
 -- Tabela para os usuários
 CREATE TABLE Usuario (
-    id SERIAL PRIMARY KEY,
+    idUsuario SERIAL PRIMARY KEY,
     nome VARCHAR(50) NOT NULL,
     senha VARCHAR(100) NOT NULL,
     email VARCHAR(100) UNIQUE NOT NULL
@@ -60,14 +60,14 @@ INSERT INTO Pedido (comanda_id, item_id, quantidade) VALUES
 (1, 2, 3),  -- 3x Cerveja (pendente)
 (1, 4, 1);  -- 1x Salada Caesar (pendente)
 
-INSERT INTO Comanda (id) values
+INSERT INTO Comanda (idComanda) values
 (3);
 
-UPDATE Comanda SET data_fechamento = CURRENT_TIMESTAMP, ComAberta = FALSE WHERE id = 3;
+UPDATE Comanda SET data_fechamento = CURRENT_TIMESTAMP, ComAberta = FALSE WHERE idComanda = 3;
 
 UPDATE Comanda 
 SET data_fechamento = NOW(), ComAberta = FALSE 
-WHERE id = 2;
+WHERE idComanda = 2;
 
 ALTER TABLE Comanda DROP COLUMN status;
 ALTER TABLE Comanda ADD COLUMN ComAberta BOOLEAN;
