@@ -42,6 +42,9 @@ ALTER TABLE Pedido ADD COLUMN status BOOLEAN;
 ALTER TABLE Item DROP COLUMN tipo;
 ALTER TABLE Item ADD COLUMN tipo BOOLEAN;
 
+ALTER TABLE Pedido RENAME COLUMN comanda_id TO comanda_idComanda;
+ALTER TABLE Pedido RENAME COLUMN item_id TO item_idItem;
+
 INSERT INTO Item (nome, tipo, preco) VALUES
 ('Picanha', TRUE, 45.00),            
 ('Cerveja', FALSE, 8.00),            
