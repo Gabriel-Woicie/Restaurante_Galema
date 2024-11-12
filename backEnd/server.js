@@ -6,4 +6,4 @@ app.get('/teste', (request, response) => {
     response.status(200).send('Requisição recebida.');
 });
 
-app.listen(3000);
+app.listen(3001);
