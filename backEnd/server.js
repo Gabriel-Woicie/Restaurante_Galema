@@ -42,4 +42,4 @@ app.post("/usuario", usuario.criar);
 app.put("/usuario/:idusuario", usuario.alterar);
 app.delete("/usuario/:idusuario", usuario.excluir);
 
-app.listen(3000);
+app.listen(3001);
