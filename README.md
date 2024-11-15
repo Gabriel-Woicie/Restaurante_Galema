@@ -13,3 +13,14 @@ Alunos:
 Gabriel Woiciechowski.
 Leonardo Felipe Zani.
 Maicon Antonio Calegari Filho.
+
+Como rodar:
+- Instale Node Server
+- Digite no terminal os seguintes comandos:
+.'npm i express'
+.'npm i sequelize'
+.'npm i dotenv'
+.'npm i pg'
+- Crie um banco de dados local postgres de acordo com os scripts no "banco.sql"
+- No arquivo .env armazene suas credenciais do banco
+- execute 'node server.js' no terminal na pasta 'backEnd'

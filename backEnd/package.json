@@ -1,7 +1,7 @@
 {
   "name": "backend",
   "version": "1.0.0",
-  "type":"module",
+  "type": "module",
   "main": "banco.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -12,6 +12,9 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
-    "express": "^4.21.1"
+    "dotenv": "^16.4.5",
+    "express": "^4.21.1",
+    "pg": "^8.13.1",
+    "sequelize": "^6.37.5"
   }
 }
