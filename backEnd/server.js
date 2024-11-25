@@ -41,5 +41,6 @@ app.get("/usuario/:idusuario", usuario.selecionar); /* com parametro */
 app.post("/usuario", usuario.criar);
 app.put("/usuario/:idusuario", usuario.alterar);
 app.delete("/usuario/:idusuario", usuario.excluir);
+app.post("/usuario/login", usuario.login);
 
-app.listen(3001);
+app.listen(3000);

@@ -1,6 +1,21 @@
 import { where } from "sequelize";
 import usuario from "../model/usuarioModel.js"
 
+async function login(req, res){
+    if (!req.body.usuario || !req.body.senha)
+        res.status(400).send("Todos os parâmetros (nome, senha) são obrigatórios.");
+
+    await usuario
+    .findOne({
+        where: {
+            nome: req.body.nome,
+            senha: req.body.senha
+        }
+    })
+    .then(resultado => { res.status(200).json(resultado) })
+    .catch(erro => { res.status(500).json(erro) });
+}
+
 async function listar(req, res){
     await usuario
     .findAll()
@@ -52,4 +67,4 @@ async function excluir(req, res){
     .catch(erro => { res.status(500).json(erro) });
 }
 
-export default { listar, selecionar, criar, alterar, excluir };
+export default { listar, selecionar, criar, alterar, excluir, login };
