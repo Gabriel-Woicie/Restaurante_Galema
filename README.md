@@ -26,21 +26,23 @@ Copiar código
 git clone https://github.com/seu-usuario/Restaurante_Galema.git
 cd Restaurante_Galema
 
-Instale as dependências:
 BACK END - 
+
 .'npm i -g nodemon typescript ts-node'
+
 .'npm i'
+
 .'npm run start-dev'
 
 FRONT END -
-.'npm create vite@latest Restaurante -- --template react'
-.'y'
-.'npm i'
-.'npm run dev'
 
-Execute o servidor:
-npm start
-Acesse o sistema no navegador:
+.'npm create vite@latest Restaurante -- --template react'
+
+.'y'
+
+.'npm i'
+
+.'npm run dev'
 
 URL padrão: http://localhost:3000
 
