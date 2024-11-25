@@ -50,19 +50,3 @@ Alunos:
 Gabriel Woiciechowski
 Leonardo Felipe Zani
 Maicon Antonio Calegari Filho
-
-
-mandar repositório
-
-BACKEND:
-1 - rodar: npm i -g nodemon typescript ts-node
-2 - npm i
-3 - npm run start-dev
-
-/---------------------------------------/
-
-NO FRONT:
-1 - rodar: npm create vite@latest Restaurante -- --template react
-2 - y
-3 - npm i
-4 - npm run dev, vai aparecer o botão do link, para clicar, e fazer funcionar
