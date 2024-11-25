@@ -27,10 +27,16 @@ git clone https://github.com/seu-usuario/Restaurante_Galema.git
 cd Restaurante_Galema
 
 Instale as dependências:
-.'npm i express'
-.'npm i sequelize'
-.'npm i dotenv'
-.'npm i pg'
+BACK END - 
+.'npm i -g nodemon typescript ts-node'
+.'npm i'
+.'npm run start-dev'
+
+FRONT END -
+.'npm create vite@latest Restaurante -- --template react'
+.'y'
+.'npm i'
+.'npm run dev'
 
 Execute o servidor:
 npm start
@@ -46,3 +52,17 @@ Leonardo Felipe Zani
 Maicon Antonio Calegari Filho
 
 
+mandar repositório
+
+BACKEND:
+1 - rodar: npm i -g nodemon typescript ts-node
+2 - npm i
+3 - npm run start-dev
+
+/---------------------------------------/
+
+NO FRONT:
+1 - rodar: npm create vite@latest Restaurante -- --template react
+2 - y
+3 - npm i
+4 - npm run dev, vai aparecer o botão do link, para clicar, e fazer funcionar
