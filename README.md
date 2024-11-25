@@ -1,26 +1,48 @@
-Programa básico para gestão de um restaurante, trabalho feito para faculdade UNOESC
-nas matérias de Banco de Dados 2 e Programação 2.
+📋 Sistema de Restaurante - Galema.  
 
-Desenvolvido em:
--JavaScript
--Node.js
--Express
--React
--Sequelize
+Este é um sistema de gerenciamento de restaurantes desenvolvido para otimizar operações, como gerenciar pedidos, cardápios e reservas. O objetivo principal do projeto é oferecer uma experiência amigável e eficiente para administradores e usuários finais.
 
-Prof. Álvaro Pagliari.
-Alunos:
-Gabriel Woiciechowski.
-Leonardo Felipe Zani.
-Maicon Antonio Calegari Filho.
+🚀 Tecnologias Utilizadas
+As seguintes tecnologias foram empregadas no desenvolvimento deste sistema:
 
-Como rodar:
-- Instale Node Server
-- Digite no terminal os seguintes comandos:
+Node.js: Para o back-end, proporcionando alta performance e escalabilidade.
+JavaScript: Para funcionalidades dinâmicas no front-end.
+TypeScript: Para adicionar tipagem ao código e aumentar a manutenção e confiabilidade do projeto.
+HTML5: Estruturação da interface do sistema.
+CSS: Estilização e design responsivo.
+
+🛠️ Funcionalidades Principais
+Gerenciamento de Pedidos: Criação, atualização e monitoramento do status dos pedidos.
+Cadastro de Cardápio: Adição, edição e exclusão de itens do menu.
+Controle de Mesas e Reservas: Organização de mesas disponíveis e gerenciamento de reservas.
+Sistema Responsivo: Interface adaptada para diferentes dispositivos (desktop, tablets e smartphones).
+Autenticação de Usuários: Login seguro para administradores e atendentes.
+
+📦 Como Executar o Projeto
+Clone o repositório:
+
+
+Copiar código
+git clone https://github.com/seu-usuario/Restaurante_Galema.git
+cd Restaurante_Galema
+
+Instale as dependências:
 .'npm i express'
 .'npm i sequelize'
 .'npm i dotenv'
 .'npm i pg'
-- Crie um banco de dados local postgres de acordo com os scripts no "banco.sql"
-- No arquivo .env armazene suas credenciais do banco
-- execute 'node server.js' no terminal na pasta 'backEnd'
+
+Execute o servidor:
+npm start
+Acesse o sistema no navegador:
+
+URL padrão: http://localhost:3000
+
+✒️ Equipe
+Professor Orientador: Álvaro Pagliari
+Alunos:
+Gabriel Woiciechowski
+Leonardo Felipe Zani
+Maicon Antonio Calegari Filho
+
+
