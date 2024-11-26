@@ -44,7 +44,7 @@ FRONT END -
 
 .'npm run dev'
 
-URL padrão: http://localhost:3000
+URL padrão: http://localhost:4000
 
 ✒️ Equipe
 Professor Orientador: Álvaro Pagliari
