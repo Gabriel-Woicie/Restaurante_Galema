@@ -36,18 +36,14 @@ BACK END -
 
 FRONT END -
 
-.'npm create vite@latest Restaurante -- --template react'
-
-.'y'
-
-.'npm i'
-
-.'npm run dev'
+em manutenção
 
 URL padrão: http://localhost:4000
 
 ✒️ Equipe
+
 Professor Orientador: Álvaro Pagliari
+
 Alunos:
 Gabriel Woiciechowski
 Leonardo Felipe Zani
