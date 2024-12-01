@@ -36,9 +36,15 @@ BACK END -
 
 FRONT END -
 
-em manutenção
+baixar expo no celular
 
-URL padrão: http://localhost:4000
+baixar a pastas front end e acessa-la no terminal
+
+.'npm install'
+
+.'npx expo start'
+
+após isso aparecerá um qrcode no terminal, só escanear dentro do app do expo do celular (IOS tem que ser direto pela camera)
 
 ✒️ Equipe
 
