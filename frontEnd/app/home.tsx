@@ -13,7 +13,7 @@ export default function HomeScreen() {
       </TouchableOpacity>
 
       <View style={styles.row}>
-        <TouchableOpacity style={styles.box}>
+        <TouchableOpacity style={styles.box} onPress={() => router.push('/comandasMain')} >
           <Icon name="clipboard-list" size={30} color="#3E4E50" />
           <Text style={styles.textSecondary}>Comandas</Text>
         </TouchableOpacity>
@@ -35,7 +35,7 @@ export default function HomeScreen() {
       </View>
 
       <View style={styles.row}>
-        <TouchableOpacity style={styles.box}>
+        <TouchableOpacity style={styles.box} onPress={() => router.push('/configuracoes')}>
           <Icon name="cog" size={30} color="#3E4E50" />
           <Text style={styles.textSecondary}>Configurações</Text>
         </TouchableOpacity>

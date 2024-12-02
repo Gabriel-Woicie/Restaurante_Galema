@@ -17,6 +17,11 @@ export default function VenderScreen() {
       { idproduto: 3, nomeproduto: 'Filé de Tilápia', valorproduto: 32.5 },
       { idproduto: 4, nomeproduto: 'Chandon', valorproduto: 180.0 },
       { idproduto: 5, nomeproduto: 'Batata Frita', valorproduto: 12.0 },
+      { idproduto: 6, nomeproduto: 'Cerveja Heineken', valorproduto: 8.0 },
+      { idproduto: 7, nomeproduto: 'Coca-Cola', valorproduto: 5.0 },
+      { idproduto: 8, nomeproduto: 'Água Mineral', valorproduto: 3.5 },
+      { idproduto: 9, nomeproduto: 'Café Expresso', valorproduto: 3.0 },
+      { idproduto: 10, nomeproduto: 'Bolo de Chocolate', valorproduto: 6.0 },
     ];
     setProdutos(produtosMockados);
   }, []);
@@ -80,7 +85,7 @@ export default function VenderScreen() {
         keyExtractor={(item) => item.idproduto.toString()}
         renderItem={renderProduto}
         numColumns={2}
-        contentContainerStyle={styles.list}
+        contentContainerStyle={[styles.list, {paddingBottom: 80}]}
       />
       <View style={styles.pedidoBar}>
         <TouchableOpacity style={styles.toggleButton} onPress={() => setIsModalVisible(true)}>

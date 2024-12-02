@@ -1,42 +1,39 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, FlatList, Modal } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, FlatList, Modal, TextInput } from 'react-native';
 import { usePedido } from '../context/PedidoContext';
 import { useRouter } from 'expo-router';
 
 export default function ComandasScreen() {
-  const { pedido, totalItems, totalPrice } = usePedido();
+  const { totalPrice } = usePedido();
   const router = useRouter();
-  const comandasMockadas = [
-    { id: 1, nome: 'Mesa 1' },
-    { id: 2, nome: 'Mesa 2' },
-    { id: 3, nome: 'Mesa 3' },
-  ];
 
+  const comandasMockadas = Array.from({ length: 50 }, (_, index) => ({
+    id: index + 1,
+    nome: `Mesa ${index + 1}`,
+  }));
+
+  const [comandas, setComandas] = useState(comandasMockadas);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [isCreateModalVisible, setIsCreateModalVisible] = useState(false);
+  const [newComandaName, setNewComandaName] = useState('');
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedComanda, setSelectedComanda] = useState<{ id: number; nome: string } | null>(null);
 
-  const registrarPedido = () => {
-    if (selectedComanda) {
-      console.log('Registrando pedido na comanda:', selectedComanda.id);
+  const ITEMS_PER_PAGE = 20;
 
-      // Aqui você pode implementar a chamada para a API para registrar o pedido
-      /*
-      fetch('http://sua-api.com/pedidos', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          idcomanda: selectedComanda.id,
-          pedido: pedido, // Passar os itens do pedido
-        }),
-      })
-        .then(response => response.json())
-        .then(data => console.log(data))
-        .catch(error => console.error(error));
-      */
+  const currentData = comandas.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE
+  );
 
-      // Fechar o modal e voltar para a tela de vendas
-      setIsModalVisible(false);
-      router.push('/vender'); // Navega de volta para a tela de vendas
+  const handleCreateComanda = () => {
+    if (newComandaName.trim()) {
+      const newComanda = { id: comandas.length + 1, nome: newComandaName.trim() };
+      setComandas([...comandas, newComanda]);
+      setNewComandaName('');
+      setIsCreateModalVisible(false);
+    } else {
+      alert('Insira um nome válido.');
     }
   };
 
@@ -46,12 +43,16 @@ export default function ComandasScreen() {
   };
 
   return (
-    <View style={{ flex: 1 }}>
-      <TouchableOpacity style={styles.createButton}>
+    <View style={{ flex: 1, padding: 10 }}>
+      <TouchableOpacity
+        style={styles.createButton}
+        onPress={() => setIsCreateModalVisible(true)}
+      >
         <Text style={styles.createButtonText}>Criar Comanda</Text>
       </TouchableOpacity>
+
       <FlatList
-        data={comandasMockadas}
+        data={currentData}
         keyExtractor={(item) => item.id.toString()}
         renderItem={({ item }) => (
           <TouchableOpacity style={styles.card} onPress={() => openModal(item)}>
@@ -60,25 +61,61 @@ export default function ComandasScreen() {
         )}
       />
 
-      {/* Modal para registrar pedido na comanda */}
+      <View style={styles.paginationContainer}>
+        <TouchableOpacity
+          disabled={currentPage === 1}
+          onPress={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+          style={[styles.paginationButton, currentPage === 1 && styles.disabledButton]}
+        >
+          <Text style={styles.paginationText}>Anterior</Text>
+        </TouchableOpacity>
+        <Text style={styles.paginationCenterText}>Página {currentPage}</Text>
+        <TouchableOpacity
+          disabled={currentPage === Math.ceil(comandas.length / ITEMS_PER_PAGE)}
+          onPress={() => setCurrentPage((prev) => Math.min(prev + 1, Math.ceil(comandas.length / ITEMS_PER_PAGE)))}
+          style={[
+            styles.paginationButton,
+            currentPage === Math.ceil(comandas.length / ITEMS_PER_PAGE) && styles.disabledButton,
+          ]}
+        >
+          <Text style={styles.paginationText}>Próximo</Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* Modal para Criar Comanda */}
+      <Modal visible={isCreateModalVisible} transparent={true} animationType="fade">
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContainer}>
+            <Text style={styles.modalTitle}>Criar Comanda</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Nome da comanda"
+              value={newComandaName}
+              onChangeText={setNewComandaName}
+            />
+            <TouchableOpacity style={styles.modalButton} onPress={handleCreateComanda}>
+              <Text style={styles.modalButtonText}>Criar</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+
+      {/* Modal para Detalhes da Comanda */}
       <Modal
         visible={isModalVisible}
         animationType="fade"
         transparent={true}
         onRequestClose={() => setIsModalVisible(false)}
       >
-        <View style={styles.modalBackground}>
+        <View style={styles.modalOverlay}>
           <View style={styles.modalContainer}>
             <Text style={styles.modalTitle}>Registrar Pedido na Comanda</Text>
             {selectedComanda && (
               <>
                 <Text style={styles.modalText}>Comanda: {selectedComanda.nome}</Text>
                 <Text style={styles.modalText}>Total: R$ {totalPrice.toFixed(2)}</Text>
-                <TouchableOpacity style={styles.modalCloseButton} onPress={() => setIsModalVisible(false)}>
-                  <Text style={styles.modalCloseButtonText}>Fechar</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.confirmButton} onPress={registrarPedido}>
-                  <Text style={styles.confirmButtonText}>Confirmar</Text>
+                <TouchableOpacity style={styles.modalButton} onPress={() => setIsModalVisible(false)}>
+                  <Text style={styles.modalButtonText}>Fechar</Text>
                 </TouchableOpacity>
               </>
             )}
@@ -91,11 +128,9 @@ export default function ComandasScreen() {
 
 const styles = StyleSheet.create({
   createButton: {
-    marginTop: 20,
-    marginHorizontal: 15,
     backgroundColor: '#3d2b19',
     padding: 15,
-    marginBottom: 5,
+    marginBottom: 10,
     borderRadius: 8,
     alignItems: 'center',
   },
@@ -105,25 +140,43 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   card: {
-    flex: 1,
     backgroundColor: '#fff',
-    marginHorizontal: 15,
-    marginVertical: 8,
+    marginBottom: 10,
     borderRadius: 8,
     padding: 15,
     alignItems: 'center',
-    elevation: 4,
+    elevation: 2,
   },
   cardText: {
     fontSize: 16,
     fontWeight: 'bold',
-    textAlign: 'center',
   },
-  modalBackground: {
+  paginationContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 10,
+  },
+  paginationButton: {
+    padding: 10,
+    borderRadius: 5,
+    backgroundColor: '#3d2b19',
+  },
+  disabledButton: {
+    backgroundColor: '#ccc',
+  },
+  paginationText: {
+    color: '#fff',
+    fontWeight: 'bold',
+  },
+  paginationCenterText: {
+    color: '#3d2b19',
+    fontWeight: 'bold',
+  },
+  modalOverlay: {
     flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
   modalContainer: {
     width: '80%',
@@ -136,35 +189,28 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
     marginBottom: 15,
-    textAlign: 'center',
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 5,
+    padding: 10,
+    width: '100%',
+    marginBottom: 15,
+  },
+  modalButton: {
+    backgroundColor: 'green',
+    padding: 10,
+    borderRadius: 8,
+    alignItems: 'center',
+    width: '100%',
+  },
+  modalButtonText: {
+    color: '#fff',
+    fontWeight: 'bold',
   },
   modalText: {
     fontSize: 16,
     marginBottom: 10,
-    textAlign: 'center',
-  },
-  modalCloseButton: {
-    backgroundColor: '#FF6347',
-    padding: 10,
-    marginBottom: 10,
-    borderRadius: 8,
-    width: '80%',
-    alignItems: 'center',
-  },
-  modalCloseButtonText: {
-    color: '#fff',
-    fontWeight: 'bold',
-  },
-  confirmButton: {
-    backgroundColor: 'green',
-    padding: 10,
-    marginBottom: 10,
-    borderRadius: 8,
-    width: '80%',
-    alignItems: 'center',
-  },
-  confirmButtonText: {
-    color: '#fff',
-    fontWeight: 'bold',
   },
 });

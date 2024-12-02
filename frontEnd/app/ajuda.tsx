@@ -11,7 +11,7 @@ export default function AjudaScreen() {
         <Icon name="help-circle" size={30} color="#3E4E50" />
         <Text style={styles.cardTitle}>Dúvidas Frequentes</Text>
         <Text style={styles.cardDescription}>Aqui você encontra respostas para as dúvidas mais comuns.</Text>
-        <TouchableOpacity style={styles.cardButton} onPress={() => Linking.openURL('http://exemplo.com/faqs')}>
+        <TouchableOpacity style={styles.cardButton}>
           <Text style={styles.cardButtonText}>Ir para FAQ</Text>
         </TouchableOpacity>
       </View>
@@ -20,7 +20,7 @@ export default function AjudaScreen() {
         <Icon name="clipboard-text" size={30} color="#3E4E50" />
         <Text style={styles.cardTitle}>Instruções Básicas</Text>
         <Text style={styles.cardDescription}>Aprenda como usar o sistema rapidamente e de forma eficaz.</Text>
-        <TouchableOpacity style={styles.cardButton} onPress={() => Linking.openURL('http://exemplo.com/instrucoes')}>
+        <TouchableOpacity style={styles.cardButton}>
           <Text style={styles.cardButtonText}>Ver Instruções</Text>
         </TouchableOpacity>
       </View>
@@ -29,7 +29,7 @@ export default function AjudaScreen() {
         <Icon name="phone" size={30} color="#3E4E50" />
         <Text style={styles.cardTitle}>Suporte</Text>
         <Text style={styles.cardDescription}>Se você precisar de ajuda adicional, entre em contato com o suporte.</Text>
-        <TouchableOpacity style={styles.cardButton} onPress={() => Linking.openURL('tel:+123456789')}>
+        <TouchableOpacity style={styles.cardButton} onPress={() => Linking.openURL('tel:49991450207')}>
           <Text style={styles.cardButtonText}>Ligar para o Suporte</Text>
         </TouchableOpacity>
       </View>
@@ -38,12 +38,12 @@ export default function AjudaScreen() {
         <Icon name="email" size={30} color="#3E4E50" />
         <Text style={styles.cardTitle}>Enviar Feedback</Text>
         <Text style={styles.cardDescription}>Compartilhe suas sugestões ou problemas com a equipe de desenvolvimento.</Text>
-        <TouchableOpacity style={styles.cardButton} onPress={() => Linking.openURL('mailto:support@exemplo.com')}>
+        <TouchableOpacity style={styles.cardButton} onPress={() => Linking.openURL('https://wa.me/55049991450207')}>
           <Text style={styles.cardButtonText}>Enviar Feedback</Text>
         </TouchableOpacity>
       </View>
 
-      <Text style={styles.footer}>© 2024 Restaurante App. Todos os direitos reservados.</Text>
+      <Text style={styles.footer}>© 2024 Galema App. Todos os direitos reservados.</Text>
     </ScrollView>
   );
 }
