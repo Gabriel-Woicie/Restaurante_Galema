@@ -15,31 +15,27 @@ export const findByPk = async (req: Request, res: Response, id: number) => {
 export const createNewEmployee = async (req: Request, res: Response): Promise<void> => {
   try {
     const {
-        idfuncionario,
-        nomefuncionario,
-        salario,
-        datacontratacao,
-        datademissao,
-        cargo,
-        situacaofuncionario,
-        idrestaurante,
-        idusuario } = req.body;
+      idfuncionario,
+      nomefuncionario,
+      salario,
+      datacontratacao,
+      datademissao,
+      situacaofuncionario
+    } = req.body;
 
     const newEmployee = await funcionariosModel.create({
-        idfuncionario,
-        nomefuncionario,
-        salario,
-        datacontratacao,
-        datademissao,
-        cargo,
-        situacaofuncionario,
-        idrestaurante,
-        idusuario
+      idfuncionario,
+      nomefuncionario,
+      salario,
+      datacontratacao,
+      datademissao,
+      situacaofuncionario
     });
+
     res.status(201).json({ newEmployee });
   } catch (error) {
-    console.error("Erro ao criar usuário:", error);
-    res.status(500).json({ error: "Erro ao criar usuário" });
+    console.error("Erro ao criar funcionário:", error);
+    res.status(500).json({ error: "Erro ao criar funcionário" });
   }
 };
 
@@ -51,7 +47,6 @@ export const updateEmployee = async (req: Request, res: Response): Promise<void>
         salario,
         datacontratacao,
         datademissao,
-        cargo,
         situacaofuncionario, } = req.body;
     const updateEmployee = await funcionariosModel.update(
       {
@@ -59,7 +54,6 @@ export const updateEmployee = async (req: Request, res: Response): Promise<void>
         salario,
         datacontratacao,
         datademissao,
-        cargo,
         situacaofuncionario
       },
       {

@@ -3,34 +3,28 @@ import { sequelize } from "../instances/pg";
 
 export interface ComandaInstance extends Model {
   idcomanda: number;
-  situacaocomanda: number;
+  situacaocomanda: boolean;  // Alterado para booleano
   valorcomanda: number;
   idmesa: number;
   idfuncionario: number;
+  idpedido: number;  // Referência ao idpedido
 }
-export const Comanda = sequelize.define<ComandaInstance>(
+
+export const comandasModel = sequelize.define<ComandaInstance>(
   "comandas",
   {
     idcomanda: {
-      primaryKey: true,
-      allowNull: false,
-      type: DataTypes.INTEGER,
-    },
+    primaryKey: true,
+    autoIncrement: true,
+    type: DataTypes.INTEGER,
+  },
     situacaocomanda: {
       allowNull: false,
-      type: DataTypes.INTEGER,
+      type: DataTypes.BOOLEAN, 
     },
     valorcomanda: {
       allowNull: true,
       type: DataTypes.DECIMAL,
-    },
-    idmesa: {
-      allowNull: false,
-      type: DataTypes.INTEGER,
-      references: {
-        model: "mesas",
-        key: "idmesa",
-      },
     },
     idfuncionario: {
       allowNull: false,
@@ -38,6 +32,14 @@ export const Comanda = sequelize.define<ComandaInstance>(
       references: {
         model: "funcionarios",
         key: "idfuncionario",
+      },
+    },
+    idpedido: {
+      allowNull: true, 
+      type: DataTypes.INTEGER,
+      references: {
+        model: "pedidos", 
+        key: "idpedido",   
       },
     },
   },

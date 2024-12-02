@@ -1,0 +1,94 @@
+CREATE TABLE funcionarios (
+  idfuncionario SERIAL PRIMARY KEY,
+  nomefuncionario VARCHAR(255) NOT NULL,
+  salario DECIMAL NOT NULL,
+  datacontratacao DATE NOT NULL,
+  datademissao DATE,
+  situacaofuncionario INTEGER NOT NULL
+);
+
+CREATE TABLE pedidos (
+  idpedido SERIAL PRIMARY KEY NOT NULL,
+  datapedido DATE NOT NULL,
+  idproduto INTEGER NOT NULL,
+  quantidade INTEGER NOT NULL,
+  -- idcomanda INTEGER NOT NULL,
+  FOREIGN KEY (idproduto) REFERENCES produtos(idproduto)
+  -- FOREIGN KEY (idcomanda) REFERENCES comandas(idcomanda)
+);
+
+CREATE TABLE comandas (
+  idcomanda SERIAL PRIMARY KEY NOT NULL,
+  situacaocomanda BOOLEAN NOT NULL,
+  valorcomanda DECIMAL,
+  idfuncionario INTEGER NOT NULL,
+  idpedido INTEGER,
+  FOREIGN KEY (idfuncionario) REFERENCES funcionarios(idfuncionario),
+  FOREIGN KEY (idpedido) REFERENCES pedidos(idpedido)
+);
+
+ALTER TABLE pedidos ADD COLUMN idcomanda INTEGER NOT NULL;
+ALTER TABLE pedidos ADD CONSTRAINT fk_comanda FOREIGN KEY (idcomanda) REFERENCES comandas(idcomanda) ON DELETE CASCADE;
+
+CREATE TABLE produtos (
+  idproduto SERIAL PRIMARY KEY NOT NULL,
+  nomeproduto VARCHAR(255) NOT NULL,
+  descricao VARCHAR(255),
+  categoria BOOLEAN NOT NULL,
+  valorproduto DECIMAL(10, 2) NOT NULL
+);
+
+CREATE TABLE usuarios (
+  idusuario SERIAL PRIMARY KEY,
+  login VARCHAR(50) NOT NULL,
+  senha VARCHAR(20) NOT NULL,
+  idfuncionario INTEGER,
+  FOREIGN KEY (idfuncionario) REFERENCES funcionarios(idfuncionario) ON DELETE SET NULL
+);
+
+INSERT INTO funcionarios (nomefuncionario, salario, datacontratacao, datademissao, situacaofuncionario)
+VALUES
+  ('João Silva', 2500.50, '2022-06-01', NULL, 1),
+  ('Maria Oliveira', 3200.75, '2021-03-15', '2023-01-20', 0),
+  ('Carlos Souza', 2900.60, '2020-08-10', NULL, 1),
+  ('Ana Costa', 3500.40, '2023-02-01', NULL, 1),
+  ('Ricardo Pereira', 2800.00, '2022-11-10', NULL, 1);
+
+INSERT INTO produtos (nomeproduto, descricao, categoria, valorproduto)
+VALUES
+  ('Café', 'Café preto', false, 5.00),
+  ('Refrigerante', 'Refrigerante sabor cola', false, 7.50),
+  ('Lanche', 'Lanche natural', true, 15.00),
+  ('Pizza', 'Pizza de calabresa', true, 30.00),
+  ('Suco', 'Suco de laranja', false, 6.00);
+
+INSERT INTO pedidos (datapedido, idproduto, quantidade, idcomanda)
+VALUES
+  ('2023-12-01', 1, 2, 2),
+  ('2023-12-02', 2, 3, 2),
+  ('2023-12-03', 3, 1, 2),
+  ('2023-12-04', 4, 1, 2),
+  ('2023-12-05', 5, 4, 2);
+
+INSERT INTO comandas (situacaocomanda, valorcomanda, idfuncionario, idpedido)
+VALUES
+  (true, 25.50, 1, 7),
+  (false, 18.00, 2, 8),
+  (true, 12.00, 3, 9),
+  (true, 45.00, 4, 10),
+  (false, 30.00, 5, 11);
+
+
+INSERT INTO usuarios (login, senha, idfuncionario)
+VALUES
+  ('johndoe', '12345', 1, 1),
+  ('maria123', 'abcde', 0, 2),
+  ('carlos2020', 'qwerty', 1, 3),
+  ('anacosta', 'password', 1, 4),
+  ('ricardopass', 'senha123', 0, 5);
+  
+SELECT * FROM COMANDAS
+SELECT * FROM FUNCIONARIOS
+SELECT * FROM PEDIDOS
+SELECT * FROM PRODUTOS
+SELECT * FROM USUARIOS
