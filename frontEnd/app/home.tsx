@@ -14,8 +14,8 @@ export default function HomeScreen() {
 
       <View style={styles.row}>
         <TouchableOpacity style={styles.box}>
-          <Icon name="table-chair" size={30} color="#3E4E50" />
-          <Text style={styles.textSecondary}>Mesas</Text>
+          <Icon name="clipboard-list" size={30} color="#3E4E50" />
+          <Text style={styles.textSecondary}>Comandas</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.box}>
           <Icon name="account-group" size={30} color="#3E4E50" />
@@ -29,63 +29,52 @@ export default function HomeScreen() {
           <Text style={styles.textSecondary}>Produtos</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.box}>
-          <Icon name="chart-line" size={30} color="#3E4E50" />
-          <Text style={styles.textSecondary}>Produtos mais vendidos</Text>
+          <Icon name="file-chart" size={30} color="#3E4E50" />
+          <Text style={styles.textSecondary}>Relatórios</Text>
         </TouchableOpacity>
       </View>
 
       <View style={styles.row}>
-        <TouchableOpacity style={styles.box}>
-          <Icon name="clipboard-list" size={30} color="#3E4E50" />
-          <Text style={styles.textSecondary}>Pedidos Abertos</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.box}>
-          <Icon name="history" size={30} color="#3E4E50" />
-          <Text style={styles.textSecondary}>Histórico de Pedidos</Text>
-        </TouchableOpacity>
-      </View>
-
-      <View style={styles.row}>
-        <TouchableOpacity style={styles.box}>
-          <Icon name="calendar-check" size={30} color="#3E4E50" />
-          <Text style={styles.textSecondary}>Reservas</Text>
-        </TouchableOpacity>
         <TouchableOpacity style={styles.box}>
           <Icon name="cog" size={30} color="#3E4E50" />
           <Text style={styles.textSecondary}>Configurações</Text>
         </TouchableOpacity>
-      </View>
-
-      <View style={styles.row}>
-        <TouchableOpacity style={styles.box}>
-          <Icon name="file-chart" size={30} color="#3E4E50" />
-          <Text style={styles.textSecondary}>Relatórios</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.box}>
-          <Icon name="comment-alert" size={30} color="#3E4E50" />
-          <Text style={styles.textSecondary}>Feedback dos Clientes</Text>
-        </TouchableOpacity>
-      </View>
-
-      <View style={styles.row}>
-        <TouchableOpacity style={styles.box}>
-          <Icon name="warehouse" size={30} color="#3E4E50" />
-          <Text style={styles.textSecondary}>Inventário</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.box}>
-          <Icon name="sale" size={30} color="#3E4E50" />
-          <Text style={styles.textSecondary}>Promoções</Text>
-        </TouchableOpacity>
-      </View>
-
-      <View style={styles.row}>
-        <TouchableOpacity style={styles.box}>
-          <Icon name="credit-card" size={30} color="#3E4E50" />
-          <Text style={styles.textSecondary}>Pagamentos</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.box}>
+        <TouchableOpacity style={styles.box} onPress={() => router.push('/ajuda')}>
           <Icon name="help-circle" size={30} color="#3E4E50" />
           <Text style={styles.textSecondary}>Ajuda</Text>
+        </TouchableOpacity>
+      </View>
+
+      <View style={styles.row}>
+        <TouchableOpacity style={styles.inactiveBox}>
+          <Icon name="calendar-check" size={30} color="#909091" />
+          <Text style={styles.textInactive}>Reservas</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.inactiveBox}>
+          <Icon name="credit-card" size={30} color="#909091" />
+          <Text style={styles.textInactive}>Pagamentos</Text>
+        </TouchableOpacity>
+      </View>
+
+      <View style={styles.row}>
+        <TouchableOpacity style={styles.inactiveBox}>
+          <Icon name="file-chart" size={30} color="#909091" />
+          <Text style={styles.textInactive}>Promoções</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.inactiveBox}>
+          <Icon name="comment-alert" size={30} color="#909091" />
+          <Text style={styles.textInactive}>Feedback dos Clientes</Text>
+        </TouchableOpacity>
+      </View>
+
+      <View style={styles.row}>
+        <TouchableOpacity style={styles.inactiveBox}>
+          <Icon name="account" size={30} color="#909091" />
+          <Text style={styles.textInactive}>Clientes</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.inactiveBox}>
+          <Icon name="sale" size={30} color="#909091" />
+          <Text style={styles.textInactive}>Promoções</Text>
         </TouchableOpacity>
       </View>
     </ScrollView>
@@ -122,6 +111,16 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     padding: 5,
   },
+  inactiveBox: {
+    backgroundColor: '#C5C5C7',
+    flex: 1,
+    height: 100,
+    marginHorizontal: 5,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 8,
+    padding: 5,
+  },
   textPrimary: {
     color: '#FFFFFF',
     fontSize: 18,
@@ -130,6 +129,13 @@ const styles = StyleSheet.create({
   },
   textSecondary: {
     color: '#3E4E50',
+    fontSize: 14,
+    fontWeight: 'bold',
+    marginTop: 5,
+    textAlign: 'center',
+  },
+  textInactive: {
+    color: '#909091',
     fontSize: 14,
     fontWeight: 'bold',
     marginTop: 5,
