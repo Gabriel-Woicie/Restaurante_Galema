@@ -6,8 +6,10 @@ import {
   TouchableOpacity,
   StyleSheet,
   Alert,
+  ImageBackground
 } from 'react-native';
 import { router } from 'expo-router';
+import { Image } from 'react-native';
 
 export default function LoginScreen() {
   const [username, setUsername] = useState('');
@@ -51,29 +53,51 @@ export default function LoginScreen() {
     */
   };
 
+  const backgroundImage = require('../assets/images/backg.jpg');
+  const logoImage = require('../assets/images/logo2.png');
+
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Sistema Galema</Text>
+      {/* Top Section */}
+      <View style={styles.topSection}>
+        <ImageBackground
+          source={backgroundImage}
+          style={{ width: '100%', height: '100%', justifyContent: 'center', alignItems: 'center' }}
+        >
+          <Image
+            source={logoImage}
+            style={{ width: 80, height: 100, position: 'absolute', borderRadius: 10 }}
+          />
+        </ImageBackground>
+      </View>
 
-      <TextInput
-        style={styles.input}
-        placeholder="Usuário"
-        value={username}
-        onChangeText={setUsername}
-        autoCapitalize="none"
-        autoCorrect={false}
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Senha"
-        value={password}
-        onChangeText={setPassword}
-        secureTextEntry
-      />
+      {/* Login Section */}
+      <View style={styles.loginSection}>
+        <Text style={styles.title}>Bem-Vindo</Text>
 
-      <TouchableOpacity style={styles.button} onPress={handleLogin}>
-        <Text style={styles.buttonText}>Acessar</Text>
-      </TouchableOpacity>
+        {/* Email Input */}
+        <TextInput
+          style={styles.input}
+          placeholder="Usuário"
+          placeholderTextColor="#888"
+          onChangeText={setUsername}
+        />
+
+        {/* Password Input */}
+        <TextInput
+          style={styles.input}
+          placeholder="Password"
+          placeholderTextColor="#888"
+          secureTextEntry
+          onChangeText={setPassword}
+        />
+
+        {/* Login Button */}
+        <TouchableOpacity style={styles.loginButton} onPress={() => router.replace('/home')} >
+          <Text style={styles.loginButtonText}>Login</Text>
+        </TouchableOpacity>
+
+      </View>
     </View>
   );
 }
@@ -81,37 +105,70 @@ export default function LoginScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#FAF3E0',
+    backgroundColor: "#f5f5f5",
+  },
+  topSection: {
+    flex: 1,
+    backgroundColor: "#000",
+    borderBottomLeftRadius: 50,
+    borderBottomRightRadius: 50,
+    overflow: "hidden",
+  },
+  logoWrapper: {
+    backgroundColor: "#fff",
+    borderRadius: 10,
     padding: 20,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 3,
+    elevation: 5,
+  },
+  logo: {
+    fontSize: 30,
+    color: "#000",
+  },
+  loginSection: {
+    flex: 2,
+    padding: 20,
+    alignItems: "center",
   },
   title: {
     fontSize: 24,
-    fontWeight: 'bold',
-    color: '#3E4E50',
-    marginBottom: 30,
+    fontWeight: "bold",
+    marginBottom: 20,
   },
   input: {
-    width: '100%',
+    width: "100%",
     height: 50,
-    backgroundColor: '#FFF',
-    borderRadius: 8,
+    borderColor: "#ccc",
+    borderWidth: 1,
+    borderRadius: 10,
     paddingHorizontal: 15,
     marginBottom: 15,
-    fontSize: 16,
-    borderWidth: 1,
-    borderColor: '#D9E4DD',
+    backgroundColor: "#fff",
   },
-  button: {
-    backgroundColor: '#8B5E3C',
-    paddingVertical: 15,
-    paddingHorizontal: 40,
-    borderRadius: 8,
+  loginButton: {
+    width: "100%",
+    height: 50,
+    backgroundColor: "#000",
+    justifyContent: "center",
+    alignItems: "center",
+    borderRadius: 10,
+    marginTop: 10,
   },
-  buttonText: {
-    color: '#FFF',
+  loginButtonText: {
+    color: "#fff",
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: "bold",
+  },
+  footerText: {
+    marginTop: 20,
+    fontSize: 14,
+    color: "#888",
+  },
+  signUp: {
+    color: "#000",
+    fontWeight: "bold",
   },
 });

@@ -27,10 +27,8 @@ export default function ConfiguracoesScreen() {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.title}>Configurações</Text>
-
-      <View style={styles.card}>
-        <Icon name="theme-light-dark" size={30} color="#3E4E50" />
+        <View style={styles.card}>
+        <Icon name="theme-light-dark" size={30} color="#000" />
         <View style={styles.cardContent}>
           <Text style={styles.cardTitle}>Modo Escuro</Text>
           <Switch value={isDarkMode} onValueChange={toggleTheme} />
@@ -38,7 +36,7 @@ export default function ConfiguracoesScreen() {
       </View>
 
       <View style={styles.card}>
-        <Icon name="bell-ring" size={30} color="#3E4E50" />
+        <Icon name="bell-ring" size={30} color="#000" />
         <View style={styles.cardContent}>
           <Text style={styles.cardTitle}>Notificações</Text>
           <Switch value={notificationsEnabled} onValueChange={toggleNotifications} />
@@ -46,7 +44,7 @@ export default function ConfiguracoesScreen() {
       </View>
 
       <View style={styles.card}>
-        <Icon name="translate" size={30} color="#3E4E50" />
+        <Icon name="translate" size={30} color="#000" />
         <TouchableOpacity style={styles.cardContent}>
           <Text style={styles.cardTitle}>Idioma</Text>
           <Text style={styles.cardSubText}>Português</Text>
@@ -54,7 +52,7 @@ export default function ConfiguracoesScreen() {
       </View>
 
       <View style={styles.card}>
-        <Icon name="account-circle" size={30} color="#3E4E50" />
+        <Icon name="account-circle" size={30} color="#000" />
         <TouchableOpacity style={styles.cardContent}>
           <Text style={styles.cardTitle}>Perfil do Usuário</Text>
           <Text style={styles.cardSubText}>Editar Informações</Text>
@@ -62,7 +60,7 @@ export default function ConfiguracoesScreen() {
       </View>
 
       <View style={styles.card}>
-        <Icon name="information" size={30} color="#3E4E50" />
+        <Icon name="information" size={30} color="#000" />
         <TouchableOpacity style={styles.cardContent}>
           <Text style={styles.cardTitle}>Sobre o App</Text>
           <Text style={styles.cardSubText}>Versão 1.0.0</Text>
@@ -79,19 +77,19 @@ export default function ConfiguracoesScreen() {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#FAF3E0',
+    backgroundColor: '#f4f4f4',
     paddingVertical: 20,
     paddingHorizontal: 20,
   },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#3E4E50',
+    color: '#000',
     marginBottom: 20,
     textAlign: 'center',
   },
   card: {
-    backgroundColor: '#D9E4DD',
+    backgroundColor: '#fff',
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 15,
@@ -108,14 +106,14 @@ const styles = StyleSheet.create({
   cardTitle: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#3E4E50',
+    color: '#000',
   },
   cardSubText: {
     fontSize: 14,
-    color: '#3E4E50',
+    color: 'gray',
   },
   logoutButton: {
-    backgroundColor: '#FF6347',
+    backgroundColor: '#000',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',

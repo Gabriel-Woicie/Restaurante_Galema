@@ -96,6 +96,9 @@ export default function ComandasScreen() {
             <TouchableOpacity style={styles.modalButton} onPress={handleCreateComanda}>
               <Text style={styles.modalButtonText}>Criar</Text>
             </TouchableOpacity>
+            <TouchableOpacity style={styles.modalButton} onPress={() => setIsCreateModalVisible(false)}>
+                  <Text style={styles.modalButtonText}>Fechar</Text>
+                </TouchableOpacity>
           </View>
         </View>
       </Modal>
@@ -128,7 +131,7 @@ export default function ComandasScreen() {
 
 const styles = StyleSheet.create({
   createButton: {
-    backgroundColor: '#3d2b19',
+    backgroundColor: '#000',
     padding: 15,
     marginBottom: 10,
     borderRadius: 8,
@@ -159,7 +162,7 @@ const styles = StyleSheet.create({
   paginationButton: {
     padding: 10,
     borderRadius: 5,
-    backgroundColor: '#3d2b19',
+    backgroundColor: '#000',
   },
   disabledButton: {
     backgroundColor: '#ccc',
@@ -199,11 +202,12 @@ const styles = StyleSheet.create({
     marginBottom: 15,
   },
   modalButton: {
-    backgroundColor: 'green',
+    backgroundColor: '#000',
     padding: 10,
     borderRadius: 8,
     alignItems: 'center',
     width: '100%',
+    marginTop: 10,
   },
   modalButtonText: {
     color: '#fff',

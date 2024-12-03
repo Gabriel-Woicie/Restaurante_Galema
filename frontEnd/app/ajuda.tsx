@@ -5,10 +5,8 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons'; // Bibliote
 export default function AjudaScreen() {
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.title}>Ajuda</Text>
-
       <View style={styles.card}>
-        <Icon name="help-circle" size={30} color="#3E4E50" />
+        <Icon name="help-circle" size={30} color="#000" />
         <Text style={styles.cardTitle}>Dúvidas Frequentes</Text>
         <Text style={styles.cardDescription}>Aqui você encontra respostas para as dúvidas mais comuns.</Text>
         <TouchableOpacity style={styles.cardButton}>
@@ -17,7 +15,7 @@ export default function AjudaScreen() {
       </View>
 
       <View style={styles.card}>
-        <Icon name="clipboard-text" size={30} color="#3E4E50" />
+        <Icon name="clipboard-text" size={30} color="#000" />
         <Text style={styles.cardTitle}>Instruções Básicas</Text>
         <Text style={styles.cardDescription}>Aprenda como usar o sistema rapidamente e de forma eficaz.</Text>
         <TouchableOpacity style={styles.cardButton}>
@@ -26,7 +24,7 @@ export default function AjudaScreen() {
       </View>
 
       <View style={styles.card}>
-        <Icon name="phone" size={30} color="#3E4E50" />
+        <Icon name="phone" size={30} color="#000" />
         <Text style={styles.cardTitle}>Suporte</Text>
         <Text style={styles.cardDescription}>Se você precisar de ajuda adicional, entre em contato com o suporte.</Text>
         <TouchableOpacity style={styles.cardButton} onPress={() => Linking.openURL('tel:49991450207')}>
@@ -35,7 +33,7 @@ export default function AjudaScreen() {
       </View>
 
       <View style={styles.card}>
-        <Icon name="email" size={30} color="#3E4E50" />
+        <Icon name="email" size={30} color="#000" />
         <Text style={styles.cardTitle}>Enviar Feedback</Text>
         <Text style={styles.cardDescription}>Compartilhe suas sugestões ou problemas com a equipe de desenvolvimento.</Text>
         <TouchableOpacity style={styles.cardButton} onPress={() => Linking.openURL('https://wa.me/55049991450207')}>
@@ -50,7 +48,7 @@ export default function AjudaScreen() {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#FAF3E0',
+    backgroundColor: '#f4f4f4',
     paddingVertical: 20,
     paddingHorizontal: 20,
   },
@@ -62,7 +60,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   card: {
-    backgroundColor: '#D9E4DD',
+    backgroundColor: '#fff',
     marginBottom: 15,
     borderRadius: 8,
     padding: 15,
@@ -71,16 +69,16 @@ const styles = StyleSheet.create({
   cardTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#3E4E50',
+    color: '#000',
     marginBottom: 5,
   },
   cardDescription: {
     fontSize: 14,
-    color: '#3E4E50',
+    color: 'gray',
     marginBottom: 10,
   },
   cardButton: {
-    backgroundColor: '#8B5E3C',
+    backgroundColor: '#000',
     padding: 10,
     borderRadius: 8,
     alignItems: 'center',

@@ -123,16 +123,16 @@ export default function VenderScreen() {
           <Text style={styles.modalTotal}>Total: R$ {totalPrice.toFixed(2)}</Text>
           <View style={styles.modalButtonContainer}>
             <TouchableOpacity
-              style={[styles.modalCloseButton, { backgroundColor: '#3d2b19' }]}
+              style={[styles.modalCloseButton, { backgroundColor: '#fff', borderColor: '#000', borderWidth: 1 }]}
               onPress={() => setIsModalVisible(false)}
             >
               <Text style={styles.modalCloseButtonText}>Fechar</Text>
             </TouchableOpacity>
             <TouchableOpacity
-              style={[styles.modalCloseButton, { backgroundColor: 'green' }]}
+              style={[styles.modalCloseButton, { backgroundColor: '#000' }]}
               onPress={finalizarPedido}
             >
-              <Text style={styles.modalCloseButtonText}>Finalizar Pedido</Text>
+              <Text style={styles.modalFinalizarButton}>Finalizar Pedido</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -176,7 +176,7 @@ const styles = StyleSheet.create({
     right: 5,
   },
   quantidade: {
-    backgroundColor: '#FF6347',
+    backgroundColor: '#000',
     borderRadius: 15,
     width: 25,
     height: 25,
@@ -189,7 +189,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   removerBotao: {
-    backgroundColor: '#FF6347',
+    backgroundColor: '#000',
     borderRadius: 15,
     width: 25,
     height: 25,
@@ -202,7 +202,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
   },
   pedidoBar: {
-    backgroundColor: '#3d2b19',
+    backgroundColor: '#000',
     position: 'absolute',
     bottom: 0,
     left: 0,
@@ -246,7 +246,7 @@ const styles = StyleSheet.create({
     marginBottom: 15,
     padding: 10,
     borderBottomWidth: 1,
-    borderBottomColor: '#ddd',
+    borderBottomColor: '#000',
   },
   modalItemText: {
     flex: 2,
@@ -259,7 +259,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 10,
   },
   modalButton: {
-    backgroundColor: '#FF6347',
+    backgroundColor: '#000',
     borderRadius: 5,
     width: 30,
     height: 30,
@@ -284,6 +284,11 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   modalCloseButtonText: {
+    color: '#000',
+    fontWeight: 'bold',
+    fontSize: 16,
+  },
+  modalFinalizarButton: {
     color: '#fff',
     fontWeight: 'bold',
     fontSize: 16,

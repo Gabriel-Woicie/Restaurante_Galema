@@ -14,33 +14,33 @@ export default function HomeScreen() {
 
       <View style={styles.row}>
         <TouchableOpacity style={styles.box} onPress={() => router.push('/comandasMain')} >
-          <Icon name="clipboard-list" size={30} color="#3E4E50" />
+          <Icon name="clipboard-list" size={30} color="#000" />
           <Text style={styles.textSecondary}>Comandas</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.box}>
-          <Icon name="account-group" size={30} color="#3E4E50" />
+        <TouchableOpacity style={styles.box} onPress={() => router.push('/funcionarios')}>
+          <Icon name="account-group" size={30} color="#000" />
           <Text style={styles.textSecondary}>Funcionários</Text>
         </TouchableOpacity>
       </View>
 
       <View style={styles.row}>
         <TouchableOpacity style={styles.box}>
-          <Icon name="package-variant" size={30} color="#3E4E50" />
+          <Icon name="package-variant" size={30} color="#000" />
           <Text style={styles.textSecondary}>Produtos</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.box}>
-          <Icon name="file-chart" size={30} color="#3E4E50" />
+          <Icon name="file-chart" size={30} color="#000" />
           <Text style={styles.textSecondary}>Relatórios</Text>
         </TouchableOpacity>
       </View>
 
       <View style={styles.row}>
         <TouchableOpacity style={styles.box} onPress={() => router.push('/configuracoes')}>
-          <Icon name="cog" size={30} color="#3E4E50" />
+          <Icon name="cog" size={30} color="#000" />
           <Text style={styles.textSecondary}>Configurações</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.box} onPress={() => router.push('/ajuda')}>
-          <Icon name="help-circle" size={30} color="#3E4E50" />
+          <Icon name="help-circle" size={30} color="#000" />
           <Text style={styles.textSecondary}>Ajuda</Text>
         </TouchableOpacity>
       </View>
@@ -83,12 +83,12 @@ export default function HomeScreen() {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#FAF3E0',
+    backgroundColor: '#fff',
     paddingVertical: 20,
     paddingHorizontal: 20,
   },
   mainButton: {
-    backgroundColor: '#8B5E3C',
+    backgroundColor: '#000',
     height: 110,
     marginHorizontal: 5,
     justifyContent: 'center',
@@ -102,7 +102,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   box: {
-    backgroundColor: '#D9E4DD',
+    backgroundColor: '#fff',
     flex: 1,
     height: 100,
     marginHorizontal: 5,
@@ -110,6 +110,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderRadius: 8,
     padding: 5,
+    borderColor: '#000',
+    borderWidth: 1,
   },
   inactiveBox: {
     backgroundColor: '#C5C5C7',

@@ -157,13 +157,13 @@ export default function ComandasMain() {
 
               <View style={styles.modalButtons}>
                 <TouchableOpacity
-                  style={[styles.modalButton, { backgroundColor: 'red' }]}
+                  style={[styles.modalButton, { backgroundColor: '#fff', borderColor: '#000', borderWidth: 1 }]}
                   onPress={() => setIsModalVisible(false)}
                 >
-                  <Text style={styles.modalButtonText}>Fechar</Text>
+                  <Text style={styles.modalFecharText}>Fechar</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
-                  style={[styles.modalButton, { backgroundColor: 'green' }]}
+                  style={[styles.modalButton, { backgroundColor: '#000' }]}
                   onPress={encerrarComanda}
                 >
                   <Text style={styles.modalButtonText}>Encerrar</Text>
@@ -188,13 +188,13 @@ export default function ComandasMain() {
           />
           <View style={styles.modalButtons}>
             <TouchableOpacity
-              style={[styles.modalButton, { backgroundColor: 'red' }]}
+              style={[styles.modalButton, { backgroundColor: '#fff', borderColor: '#000', borderWidth: 1 }]}
               onPress={() => setIsCriarModalVisible(false)}
             >
-              <Text style={styles.modalButtonText}>Cancelar</Text>
+              <Text style={styles.modalFecharText}>Cancelar</Text>
             </TouchableOpacity>
             <TouchableOpacity
-              style={[styles.modalButton, { backgroundColor: 'green' }]}
+              style={[styles.modalButton, { backgroundColor: '#000' }]}
               onPress={criarComanda}
             >
               <Text style={styles.modalButtonText}>Criar</Text>
@@ -216,7 +216,7 @@ const styles = StyleSheet.create({
       flexDirection: 'row',
       justifyContent: 'center',
       paddingVertical: 10,
-      backgroundColor: '#3d2b19',
+      backgroundColor: '#000',
     },
     toggleButton: {
       flex: 1,
@@ -224,7 +224,7 @@ const styles = StyleSheet.create({
       alignItems: 'center',
     },
     toggleButtonAtivo: {
-      borderBottomWidth: 4,
+      borderBottomWidth: 2,
       borderBottomColor: '#fff',
     },
     toggleText: {
@@ -257,7 +257,7 @@ const styles = StyleSheet.create({
       alignItems: 'center',
       paddingHorizontal: 20,
       paddingVertical: 10,
-      backgroundColor: '#3d2b19',
+      backgroundColor: '#000',
     },
     paginationButton: {
       paddingVertical: 10,
@@ -283,7 +283,7 @@ const styles = StyleSheet.create({
       bottom: 20,
       left: 20,
       right: 20,
-      backgroundColor: '#3d2b19',
+      backgroundColor: '#000',
       borderRadius: 8,
       paddingVertical: 15,
       alignItems: 'center',
@@ -338,6 +338,11 @@ const styles = StyleSheet.create({
       },
       modalButtonClose: {
         backgroundColor: '#FF6347',
+      },
+      modalFecharText: {
+        color: '#000',
+        fontWeight: 'bold',
+        fontSize: 14,
       },
       modalButtonText: {
         color: '#fff',
