@@ -24,7 +24,7 @@ export default function HomeScreen() {
       </View>
 
       <View style={styles.row}>
-        <TouchableOpacity style={styles.box}>
+        <TouchableOpacity style={styles.box} onPress={() => router.push('/produtos')}>
           <Icon name="package-variant" size={30} color="#000" />
           <Text style={styles.textSecondary}>Produtos</Text>
         </TouchableOpacity>

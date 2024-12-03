@@ -13,6 +13,7 @@ export default function RootLayout() {
         <Stack.Screen name="configuracoes" options={{ title: 'Configurações' }} />
         <Stack.Screen name="comandasMain" options={{ title: 'Comandas' }} />
         <Stack.Screen name="funcionarios" options={{ title: 'Funcionários' }} />
+        <Stack.Screen name="produtos" options={{ title: 'Produtos' }} />
       </Stack>
     </PedidoProvider>
   );
