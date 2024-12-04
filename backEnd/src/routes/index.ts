@@ -3,7 +3,6 @@ import { Router, Request, Response } from "express";
 import * as UsuariosController from "../controllers/UsuariosController";
 import * as ProdutosController from "../controllers/ProdutosController";
 import * as FuncionariosController from "../controllers/FuncionariosController";
-import * as PedidosController from "../controllers/PedidosController";
 import * as ComandasController from "../controllers/ComandasController";
 
 const router = Router();
@@ -44,18 +43,6 @@ router.get("/funcionario/:id", (req: Request, res: Response) => {
 router.post("/funcionario", FuncionariosController.createNewEmployee);
 router.put("/funcionario/:id", FuncionariosController.updateEmployee);
 router.delete("/funcionario/:id", FuncionariosController.deleteEmployee);
-
-// order routes
-router.get("/pedidos", PedidosController.findAll);
-
-router.get("/pedidos/:id", (req: Request, res: Response) => {
-  const id = parseInt(req.params.id);
-  PedidosController.findByPk(req, res, id);
-});
-
-router.post("/pedidos", PedidosController.createNewOrder);
-router.put("/pedidos/:id", PedidosController.updateOrder);
-router.delete("/pedidos/:id", PedidosController.deleteOrder);
 
 // order routes
 router.get("/comandas", ComandasController.findAll);

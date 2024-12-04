@@ -7,7 +7,6 @@ export interface ComandaInstance extends Model {
   valorcomanda: number;
   idmesa: number;
   idfuncionario: number;
-  idpedido: number;  // Referência ao idpedido
 }
 
 export const comandasModel = sequelize.define<ComandaInstance>(
@@ -26,20 +25,16 @@ export const comandasModel = sequelize.define<ComandaInstance>(
       allowNull: true,
       type: DataTypes.DECIMAL,
     },
+    nomecomanda: {
+      allowNull: false,
+      type: DataTypes.STRING(100),
+    },
     idfuncionario: {
       allowNull: false,
       type: DataTypes.INTEGER,
       references: {
         model: "funcionarios",
         key: "idfuncionario",
-      },
-    },
-    idpedido: {
-      allowNull: true, 
-      type: DataTypes.INTEGER,
-      references: {
-        model: "pedidos", 
-        key: "idpedido",   
       },
     },
   },

@@ -9,7 +9,7 @@ export interface ProdutoInstance extends Model {
   valorproduto: number;
 }
 
-export const ProdutosModel = sequelize.define<ProdutoInstance>("produtos", {
+export const produtosModel = sequelize.define<ProdutoInstance>("produtos", {
   idproduto: {
     primaryKey: true,
     autoIncrement: true,
@@ -30,6 +30,10 @@ export const ProdutosModel = sequelize.define<ProdutoInstance>("produtos", {
   valorproduto: {
     allowNull: false,
     type: DataTypes.DECIMAL(10, 2),
+  },
+  imagem: {
+    allowNull: true,
+    type: DataTypes.STRING,
   },
 }, {
   tableName: "produtos",

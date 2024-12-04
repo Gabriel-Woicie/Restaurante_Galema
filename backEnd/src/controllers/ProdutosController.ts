@@ -1,11 +1,11 @@
 import { Request, Response } from "express";
-import { ProdutosModel } from "../models/ProdutosModel";
+import { produtosModel } from "../models/ProdutosModel";
 import { Op } from "sequelize";
 
 // Buscar todos os produtos
 export const findAll = async (req: Request, res: Response): Promise<void> => {
   try {
-    const produtos = await ProdutosModel.findAll();
+    const produtos = await produtosModel.findAll();
     res.json(produtos);
   } catch (error) {
     console.error("Erro ao buscar produtos:", error);
@@ -13,33 +13,22 @@ export const findAll = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
-// Buscar um produto por ID
-export const findByPk = async (req: Request, res: Response, id: number): Promise<void> => {
-  try {
-    const { id } = req.params;
-    const produto = await ProdutosModel.findByPk(id);
-
-    if (produto) {
-      res.json(produto);
-    } else {
-      res.status(404).json({ error: "Produto não encontrado" });
-    }
-  } catch (error) {
-    console.error("Erro ao buscar produto:", error);
-    res.status(500).json({ error: "Erro ao buscar produto" });
-  }
+export const findByPk = async (req: Request, res: Response, id: number) => {
+  const produtos = await produtosModel.findByPk(id);
+  res.json(produtos);
 };
 
 // Criar um novo produto
 export const createNewProduct = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { nomeproduto, descricao, categoria, valorproduto } = req.body;
+    const { nomeproduto, descricao, categoria, valorproduto, imagem } = req.body;
 
-    const newProduct = await ProdutosModel.create({
+    const newProduct = await produtosModel.create({
       nomeproduto,
       descricao,
       categoria,
       valorproduto,
+      imagem,
     });
 
     res.status(201).json({ newProduct });
@@ -53,14 +42,15 @@ export const createNewProduct = async (req: Request, res: Response): Promise<voi
 export const updateProduct = async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
-    const { nomeproduto, descricao, categoria, valorproduto } = req.body;
+    const { nomeproduto, descricao, categoria, valorproduto , imagem } = req.body;
 
-    const updatedProduct = await ProdutosModel.update(
+    const updatedProduct = await produtosModel.update(
       {
         nomeproduto,
         descricao,
         categoria,
         valorproduto,
+        imagem,
       },
       {
         where: {
@@ -87,7 +77,7 @@ export const deleteProduct = async (req: Request, res: Response): Promise<void> 
   try {
     const { id } = req.params;
 
-    const deletedProduct = await ProdutosModel.destroy({
+    const deletedProduct = await produtosModel.destroy({
       where: {
         idproduto: {
           [Op.eq]: id,

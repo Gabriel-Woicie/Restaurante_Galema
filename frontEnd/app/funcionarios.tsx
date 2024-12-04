@@ -1,68 +1,132 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, FlatList, Modal, TextInput } from 'react-native';
+import axios from 'axios';
 
 export default function FuncionariosScreen() {
-  const [funcionarios, setFuncionarios] = useState([
-    { id: 1, nome: 'João Silva', cargo: 'Garçom', dataContratacao: '01/01/2023', salario: '1500.00' },
-    { id: 2, nome: 'Maria Oliveira', cargo: 'Cozinheira', dataContratacao: '15/02/2023', salario: '2000.00' },
-    { id: 3, nome: 'Carlos Santos', cargo: 'Gerente', dataContratacao: '10/03/2023', salario: '3000.00' },
-  ]);
-
+  interface Funcionario {
+    id: number;
+    nome: string;
+    dataContratacao: string;
+    salario: string;
+    datademissao?: string | null;
+  }
+  
+  const [funcionarios, setFuncionarios] = useState<Funcionario[]>([]);
   const [isCreateModalVisible, setIsCreateModalVisible] = useState(false);
   const [isEditModalVisible, setIsEditModalVisible] = useState(false);
   const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
 
   const [newFuncionario, setNewFuncionario] = useState({
     nome: '',
-    cargo: '',
     dataContratacao: '',
     salario: '',
   });
 
-  const [selectedFuncionario, setSelectedFuncionario] = useState<{
-    id: number;
-    nome: string;
-    cargo: string;
-    dataContratacao: string;
-    salario: string;
-  } | null>(null);
+  const [selectedFuncionario, setSelectedFuncionario] = useState<Funcionario | null>(null);
 
-  const handleCreateFuncionario = () => {
+  const BASE_URL = 'http://192.168.3.29:4005/funcionario'; // Substitua pelo IP correto
+
+  // Buscar todos os funcionários
+  const fetchFuncionarios = async () => {
+      try {
+        const response = await axios.get(BASE_URL);
+        const data = response.data.map((func: any) => ({
+          id: func.idfuncionario,
+          nome: func.nomefuncionario,
+          cargo: 'Não informado', // Adapte conforme necessário
+          dataContratacao: func.datacontratacao,
+          salario: func.salario,
+        }));
+        setFuncionarios(data);
+      } catch (error) {
+        console.error('Erro ao buscar funcionários:', error);
+        alert('Erro ao buscar funcionários. Verifique a conexão com o servidor.');
+      }
+    };
+
+    fetchFuncionarios();
+  useEffect(() => {
+    fetchFuncionarios();
+  }, []);
+  // Criar um novo funcionário
+  const handleCreateFuncionario = async () => {
     if (
       newFuncionario.nome.trim() &&
-      newFuncionario.cargo.trim() &&
       newFuncionario.dataContratacao.trim() &&
       newFuncionario.salario.trim()
     ) {
-      const newFunc = {
-        id: funcionarios.length + 1,
-        ...newFuncionario,
-      };
-      setFuncionarios([...funcionarios, newFunc]);
-      setNewFuncionario({ nome: '', cargo: '', dataContratacao: '', salario: '' });
-      setIsCreateModalVisible(false);
+      try {
+        const response = await axios.post("http://192.168.3.29:4005/funcionario", {
+          nomefuncionario: newFuncionario.nome,
+          salario: newFuncionario.salario,
+          datacontratacao: newFuncionario.dataContratacao,
+          datademissao: null, // Novo funcionário não tem data de demissão
+          situacaofuncionario: 1, // Ativo por padrão
+        });
+        if (response.status === 201) {
+          alert("Funcionário criado com sucesso!");
+          fetchFuncionarios(); // Atualiza a lista após criar
+          setIsCreateModalVisible(false);
+          setNewFuncionario({ nome: "", dataContratacao: "", salario: "" });
+        }
+      } catch (error) {
+        console.error("Erro ao criar funcionário:", error);
+        alert("Erro ao criar funcionário. Tente novamente.");
+      }
     } else {
-      alert('Preencha todos os campos.');
+      alert("Preencha todos os campos.");
     }
   };
 
-  const handleEditFuncionario = () => {
+  // Editar funcionário
+  const handleEditFuncionario = async () => {
     if (selectedFuncionario) {
-      setFuncionarios(
-        funcionarios.map((func) =>
-          func.id === selectedFuncionario.id ? { ...selectedFuncionario } : func
-        )
-      );
-      setIsEditModalVisible(false);
+      try {
+        const response = await axios.put(
+          `http://192.168.3.29:4005/funcionario/${selectedFuncionario.id}`,
+          {
+            nomefuncionario: selectedFuncionario.nome,
+            salario: selectedFuncionario.salario,
+            datacontratacao: selectedFuncionario.dataContratacao,
+            datademissao: null, // Pode ser ajustado pelo usuário futuramente
+            situacaofuncionario: 1, // Exemplo: sempre ativo na edição
+          }
+        );
+        if (response.status === 201) {
+          alert("Funcionário atualizado com sucesso!");
+          fetchFuncionarios(); // Atualiza a lista
+          setIsEditModalVisible(false);
+        }
+        else {
+          alert("Erro ao editar funcionário. Tente novamente.");
+        }
+      } catch (error) {
+        console.error("Erro ao editar funcionário:", error);
+        alert("Erro ao editar funcionário. Tente novamente.");
+      }
     }
   };
+  
 
-  const handleDeleteFuncionario = () => {
+  // Deletar funcionário
+  const handleDeleteFuncionario = async () => {
     if (selectedFuncionario) {
-      setFuncionarios(funcionarios.filter((func) => func.id !== selectedFuncionario.id));
-      setIsDeleteModalVisible(false);
+      try {
+        const response = await axios.delete(
+          `http://192.168.3.29:4005/funcionario/${selectedFuncionario.id}`
+        );
+        if (response.status === 201) {
+          alert("Funcionário excluído com sucesso!");
+          fetchFuncionarios(); // Atualiza a lista
+          setIsDeleteModalVisible(false);
+        }
+      } catch (error) {
+        console.error("Erro ao excluir funcionário:", error);
+        alert("Erro ao excluir funcionário. Tente novamente.");
+      }
     }
   };
+  
 
   return (
     <View style={{ flex: 1, padding: 10 }}>
@@ -80,7 +144,6 @@ export default function FuncionariosScreen() {
           <View style={styles.card}>
             <View style={{ flex: 1 }}>
               <Text style={styles.cardText}>{item.nome}</Text>
-              <Text style={styles.cardSubText}>Cargo: {item.cargo}</Text>
               <Text style={styles.cardSubText}>Data: {item.dataContratacao}</Text>
               <Text style={styles.cardSubText}>Salário: R$ {item.salario}</Text>
             </View>
@@ -107,136 +170,130 @@ export default function FuncionariosScreen() {
       />
 
       {/* Modal para Criar Funcionário */}
-      <Modal visible={isCreateModalVisible} transparent={true} animationType="fade">
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContainer}>
-            <Text style={styles.modalTitle}>Criar Funcionário</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Nome do funcionário"
-              value={newFuncionario.nome}
-              onChangeText={(text) => setNewFuncionario({ ...newFuncionario, nome: text })}
-            />
-            <TextInput
-              style={styles.input}
-              placeholder="Cargo"
-              value={newFuncionario.cargo}
-              onChangeText={(text) => setNewFuncionario({ ...newFuncionario, cargo: text })}
-            />
-            <TextInput
-              style={styles.input}
-              placeholder="Data de Contratação"
-              value={newFuncionario.dataContratacao}
-              onChangeText={(text) =>
-                setNewFuncionario({ ...newFuncionario, dataContratacao: text })
-              }
-            />
-            <TextInput
-              style={styles.input}
-              placeholder="Salário"
-              keyboardType="numeric"
-              value={newFuncionario.salario}
-              onChangeText={(text) => setNewFuncionario({ ...newFuncionario, salario: text })}
-            />
-            <TouchableOpacity style={styles.modalButton} onPress={handleCreateFuncionario}>
-              <Text style={styles.modalButtonText}>Criar</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.cancelButton}
-              onPress={() => setIsCreateModalVisible(false)}
-            >
-              <Text style={styles.cancelButtonText}>Fechar</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </Modal>
+<Modal visible={isCreateModalVisible} transparent={true} animationType="fade">
+  <View style={styles.modalOverlay}>
+    <View style={styles.modalContainer}>
+      <Text style={styles.modalTitle}>Criar Funcionário</Text>
+      <TextInput
+        style={styles.input}
+        placeholder="Nome do funcionário"
+        value={newFuncionario.nome}
+        onChangeText={(text) => setNewFuncionario({ ...newFuncionario, nome: text })}
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="Data de Contratação"
+        value={newFuncionario.dataContratacao}
+        onChangeText={(text) =>
+          setNewFuncionario({ ...newFuncionario, dataContratacao: text })
+        }
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="Salário"
+        keyboardType="numeric"
+        value={newFuncionario.salario}
+        onChangeText={(text) => setNewFuncionario({ ...newFuncionario, salario: text })}
+      />
+      <TouchableOpacity style={styles.modalButton} onPress={handleCreateFuncionario}>
+        <Text style={styles.modalButtonText}>Criar</Text>
+      </TouchableOpacity>
+      <TouchableOpacity
+        style={styles.cancelButton}
+        onPress={() => setIsCreateModalVisible(false)}
+      >
+        <Text style={styles.cancelButtonText}>Cancelar</Text>
+      </TouchableOpacity>
+    </View>
+  </View>
+</Modal>
 
-      {/* Modal para Editar Funcionário */}
-      <Modal visible={isEditModalVisible} transparent={true} animationType="fade">
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContainer}>
-            <Text style={styles.modalTitle}>Editar Funcionário</Text>
-            {selectedFuncionario && (
-              <>
-                <TextInput
-                  style={styles.input}
-                  placeholder="Nome do funcionário"
-                  value={selectedFuncionario.nome}
-                  onChangeText={(text) =>
-                    setSelectedFuncionario({ ...selectedFuncionario, nome: text })
-                  }
-                />
-                <TextInput
-                  style={styles.input}
-                  placeholder="Cargo"
-                  value={selectedFuncionario.cargo}
-                  onChangeText={(text) =>
-                    setSelectedFuncionario({ ...selectedFuncionario, cargo: text })
-                  }
-                />
-                <TextInput
-                  style={styles.input}
-                  placeholder="Data de Contratação"
-                  value={selectedFuncionario.dataContratacao}
-                  onChangeText={(text) =>
-                    setSelectedFuncionario({
-                      ...selectedFuncionario,
-                      dataContratacao: text,
-                    })
-                  }
-                />
-                <TextInput
-                  style={styles.input}
-                  placeholder="Salário"
-                  keyboardType="numeric"
-                  value={selectedFuncionario.salario}
-                  onChangeText={(text) =>
-                    setSelectedFuncionario({ ...selectedFuncionario, salario: text })
-                  }
-                />
-                <TouchableOpacity style={styles.modalButton} onPress={handleEditFuncionario}>
-                  <Text style={styles.modalButtonText}>Salvar</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={styles.cancelButton}
-                  onPress={() => setIsEditModalVisible(false)}
-                >
-                  <Text style={styles.cancelButtonText}>Fechar</Text>
-                </TouchableOpacity>
-              </>
-            )}
-          </View>
-        </View>
-      </Modal>
 
-      {/* Modal para Excluir Funcionário */}
-      <Modal visible={isDeleteModalVisible} transparent={true} animationType="fade">
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContainer}>
-            <Text style={styles.modalTitle}>Confirmação de Exclusão</Text>
-            <Text style={styles.modalText}>
-              Tem certeza que deseja remover o funcionário{' '}
-              {selectedFuncionario?.nome || ''}?
-            </Text>
-            <TouchableOpacity
-              style={styles.modalButton}
-              onPress={handleDeleteFuncionario}
-            >
-              <Text style={styles.modalButtonText}>Sim</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.cancelButton}
-              onPress={() => setIsDeleteModalVisible(false)}
-            >
-              <Text style={styles.cancelButtonText}>Cancelar</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </Modal>
+{/* Modal para Editar Funcionário */}
+<Modal visible={isEditModalVisible} transparent={true} animationType="fade">
+  <View style={styles.modalOverlay}>
+    <View style={styles.modalContainer}>
+      <Text style={styles.modalTitle}>Editar Funcionário</Text>
+      {selectedFuncionario && (
+        <>
+          <TextInput
+            style={styles.input}
+            placeholder="Nome do funcionário"
+            value={selectedFuncionario.nome}
+            onChangeText={(text) =>
+              setSelectedFuncionario({ ...selectedFuncionario, nome: text })
+            }
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="Data de Contratação"
+            value={selectedFuncionario.dataContratacao}
+            onChangeText={(text) =>
+              setSelectedFuncionario({
+                ...selectedFuncionario,
+                dataContratacao: text,
+              })
+            }
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="Data de Demissão"
+            value={selectedFuncionario.datademissao || ""}
+            onChangeText={(text) =>
+              setSelectedFuncionario({
+                ...selectedFuncionario,
+                datademissao: text || null,
+              })
+            }
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="Salário"
+            keyboardType="numeric"
+            value={selectedFuncionario.salario}
+            onChangeText={(text) =>
+              setSelectedFuncionario({ ...selectedFuncionario, salario: text })
+            }
+          />
+          <TouchableOpacity style={styles.modalButton} onPress={handleEditFuncionario}>
+            <Text style={styles.modalButtonText}>Salvar</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.cancelButton}
+            onPress={() => setIsEditModalVisible(false)}
+          >
+            <Text style={styles.cancelButtonText}>Cancelar</Text>
+          </TouchableOpacity>
+        </>
+      )}
+    </View>
+  </View>
+</Modal>
+
+{/* Modal para Excluir Funcionário */}
+<Modal visible={isDeleteModalVisible} transparent={true} animationType="fade">
+  <View style={styles.modalOverlay}>
+    <View style={styles.modalContainer}>
+      <Text style={styles.modalTitle}>Confirmação de Exclusão</Text>
+      <Text style={styles.modalText}>
+        Tem certeza que deseja remover o funcionário {selectedFuncionario?.nome || ""}?
+      </Text>
+      <TouchableOpacity style={styles.modalButton} onPress={handleDeleteFuncionario}>
+        <Text style={styles.modalButtonText}>Sim</Text>
+      </TouchableOpacity>
+      <TouchableOpacity
+        style={styles.cancelButton}
+        onPress={() => setIsDeleteModalVisible(false)}
+      >
+        <Text style={styles.cancelButtonText}>Cancelar</Text>
+      </TouchableOpacity>
+    </View>
+  </View>
+</Modal>
+
     </View>
   );
 }
-
 
 const styles = StyleSheet.create({
   createButton: {
@@ -291,58 +348,53 @@ const styles = StyleSheet.create({
   },
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
     justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
   modalContainer: {
-    width: '80%',
     backgroundColor: '#fff',
-    borderRadius: 10,
     padding: 20,
-    alignItems: 'center',
+    borderRadius: 8,
+    width: '80%',
   },
   modalTitle: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: 'bold',
-    marginBottom: 15,
+    marginBottom: 10,
   },
   modalText: {
     fontSize: 16,
-    marginBottom: 15,
-    textAlign: 'center',
+    marginBottom: 20,
   },
   input: {
     borderWidth: 1,
     borderColor: '#ccc',
-    borderRadius: 5,
     padding: 10,
-    width: '100%',
-    marginBottom: 15,
+    borderRadius: 8,
+    marginBottom: 10,
   },
   modalButton: {
     backgroundColor: '#000',
-    padding: 10,
+    padding: 15,
     borderRadius: 8,
-    width: '100%',
     alignItems: 'center',
     marginBottom: 10,
   },
   modalButtonText: {
     color: '#fff',
     fontWeight: 'bold',
+    fontSize: 16,
   },
   cancelButton: {
-    backgroundColor: '#fff',
-    padding: 10,
+    backgroundColor: '#ccc',
+    padding: 15,
     borderRadius: 8,
-    width: '100%',
     alignItems: 'center',
-    borderColor: '#000',
-    borderWidth: 1,
   },
   cancelButtonText: {
     color: '#000',
     fontWeight: 'bold',
+    fontSize: 16,
   },
 });

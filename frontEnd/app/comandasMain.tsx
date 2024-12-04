@@ -1,16 +1,23 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, FlatList, StyleSheet, Modal, TextInput } from 'react-native';
+import React, { useState, useEffect } from "react";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  FlatList,
+  StyleSheet,
+  Modal,
+  TextInput,
+  Alert,
+} from "react-native";
+import axios from "axios";
 
 export default function ComandasMain() {
   const [toggleAtivo, setToggleAtivo] = useState(true); // Estado do toggle bar
   interface Comanda {
     id: number;
-    nome: string;
-    situacao: string;
-    valor: string;
-    idFuncionario: number;
-    idPedido: number;
-    ativa: boolean;
+    nomecomanda: string;
+    situacaocomanda: boolean;
+    valorcomanda: number;
   }
 
   const [comandas, setComandas] = useState<Comanda[]>([]); // Lista de comandas
@@ -18,61 +25,93 @@ export default function ComandasMain() {
   const [isModalVisible, setIsModalVisible] = useState(false); // Modal para detalhes da comanda
   const [isCriarModalVisible, setIsCriarModalVisible] = useState(false); // Modal para criar comanda
   const [comandaSelecionada, setComandaSelecionada] = useState<Comanda | null>(null); // Comanda selecionada
-  const [novaComandaNome, setNovaComandaNome] = useState(''); // Nome da nova comanda
-  const [novaComandaValor, setNovaComandaValor] = useState(''); // Valor da nova comanda
+  const [novaComanda, setNovaComanda] = useState({ nome: "", valor: "" }); // Nova comanda
 
   const itensPorPagina = 20;
 
+  // Função para carregar todas as comandas
+  const carregarComandas = async () => {
+    try {
+      const response = await axios.get("http://192.168.3.29/comandas");
+      setComandas(response.data);
+    } catch (error) {
+      Alert.alert("Erro", "Não foi possível carregar as comandas.");
+      console.error(error);
+    }
+  };
+
   useEffect(() => {
-    const mockComandas = Array.from({ length: 100 }, (_, i) => ({
-      id: i + 1,
-      nome: `Comanda ${i + 1}`,
-      situacao: i % 2 === 0 ? 'Aberta' : 'Fechada',
-      valor: (Math.random() * 200).toFixed(2),
-      idFuncionario: Math.floor(Math.random() * 10) + 1,
-      idPedido: Math.floor(Math.random() * 1000) + 1,
-      ativa: i % 2 === 0,
-    }));
-    setComandas(mockComandas);
+    carregarComandas();
   }, []);
 
-  const comandasFiltradas = comandas.filter((c) => c.ativa === toggleAtivo);
+  const comandasFiltradas = comandas.filter((c) =>
+    toggleAtivo ? c.situacaocomanda == true : c.situacaocomanda == false
+  );
+
   const comandasPaginadas = comandasFiltradas.slice(
     (paginaAtual - 1) * itensPorPagina,
     paginaAtual * itensPorPagina
   );
 
-  const abrirComandaDetalhes = (comanda: Comanda) => {
-    setComandaSelecionada(comanda);
-    setIsModalVisible(true);
-  };
+  // Função para criar uma nova comanda
+  const criarComanda = async () => {
+    if (!novaComanda.nome || !novaComanda.valor) {
+      Alert.alert("Erro", "Todos os campos devem ser preenchidos.");
+      return;
+    }
 
-  const encerrarComanda = () => {
-    if (comandaSelecionada) {
-      setComandas((prevComandas) =>
-        prevComandas.map((c) =>
-          c.id === comandaSelecionada.id ? { ...c, ativa: false, situacao: 'Fechada' } : c
-        )
-      );
-      setIsModalVisible(false);
+    try {
+      const response = await axios.post("http://192.168.3.29/comandas", {
+        nomecomanda: novaComanda.nome,
+        situacaocomanda: "Aberta",
+        valorcomanda: parseFloat(novaComanda.valor),
+        idfuncionario: 1, // Substituir com o ID real do funcionário
+        idpedido: 0, // Substituir com o ID real do pedido
+      });
+      setComandas([response.data, ...comandas]);
+      setNovaComanda({ nome: "", valor: "" });
+      setIsCriarModalVisible(false);
+    } catch (error) {
+      Alert.alert("Erro", "Não foi possível criar a comanda.");
+      console.error(error);
     }
   };
 
-  const criarComanda = () => {
-    if (novaComandaNome) {
-      const novaComanda = {
-        id: comandas.length + 1,
-        nome: novaComandaNome,
-        situacao: 'Aberta',
-        valor: parseFloat(novaComandaValor).toFixed(2),
-        idFuncionario: Math.floor(Math.random() * 10) + 1,
-        idPedido: Math.floor(Math.random() * 1000) + 1,
-        ativa: true,
-      };
-      setComandas((prevComandas) => [novaComanda, ...prevComandas]);
-      setNovaComandaNome('');
-      setNovaComandaValor('');
-      setIsCriarModalVisible(false);
+  // Função para encerrar uma comanda
+  const encerrarComanda = async () => {
+    if (!comandaSelecionada) return;
+
+    try {
+      await axios.put(
+        `http://192.168.3.29/comandas/${comandaSelecionada.id}`,
+        {
+          ...comandaSelecionada,
+          situacaocomanda: "Fechada",
+        }
+      );
+      setComandas((prev) =>
+        prev.map((c) =>
+          c.id === comandaSelecionada.id
+            ? { ...c, situacaocomanda: false }
+            : c
+        )
+      );
+      setIsModalVisible(false);
+    } catch (error) {
+      Alert.alert("Erro", "Não foi possível encerrar a comanda.");
+      console.error(error);
+    }
+  };
+
+  // Função para deletar uma comanda
+  const deletarComanda = async (id: number) => {
+    try {
+      await axios.delete(`http://192.168.3.29/comandas/${id}`);
+      setComandas((prev) => prev.filter((c) => c.id !== id));
+      Alert.alert("Sucesso", "Comanda deletada com sucesso.");
+    } catch (error) {
+      Alert.alert("Erro", "Não foi possível deletar a comanda.");
+      console.error(error);
     }
   };
 
@@ -99,39 +138,19 @@ export default function ComandasMain() {
         data={comandasPaginadas}
         keyExtractor={(item) => item.id.toString()}
         renderItem={({ item }) => (
-          <TouchableOpacity style={styles.card} onPress={() => abrirComandaDetalhes(item)}>
-            <Text style={styles.cardText}>{item.nome}</Text>
-            <Text style={styles.cardInfo}>Valor: R$ {item.valor}</Text>
+          <TouchableOpacity
+            style={styles.card}
+            onPress={() => {
+              setComandaSelecionada(item);
+              setIsModalVisible(true);
+            }}
+          >
+            <Text style={styles.cardText}>{item.nomecomanda}</Text>
+            <Text style={styles.cardInfo}>Valor: R$ {item.valorcomanda}</Text>
           </TouchableOpacity>
         )}
         contentContainerStyle={styles.lista}
       />
-
-      {/* Paginação */}
-      <View style={styles.pagination}>
-        <TouchableOpacity
-          disabled={paginaAtual === 1}
-          onPress={() => setPaginaAtual((prev) => Math.max(prev - 1, 1))}
-          style={[styles.paginationButton, paginaAtual === 1 && styles.paginationButtonDisabled]}
-        >
-          <Text style={styles.paginationText}>Anterior</Text>
-        </TouchableOpacity>
-        <Text style={styles.paginationInfo}>Página {paginaAtual}</Text>
-        <TouchableOpacity
-          disabled={paginaAtual * itensPorPagina >= comandasFiltradas.length}
-          onPress={() =>
-            setPaginaAtual((prev) =>
-              prev * itensPorPagina < comandasFiltradas.length ? prev + 1 : prev
-            )
-          }
-          style={[
-            styles.paginationButton,
-            paginaAtual * itensPorPagina >= comandasFiltradas.length && styles.paginationButtonDisabled,
-          ]}
-        >
-          <Text style={styles.paginationText}>Próximo</Text>
-        </TouchableOpacity>
-      </View>
 
       {/* Botão Criar Comanda */}
       <TouchableOpacity
@@ -141,66 +160,66 @@ export default function ComandasMain() {
         <Text style={styles.criarButtonText}>Criar Comanda</Text>
       </TouchableOpacity>
 
-      {/* Modal de Detalhes da Comanda */}
-      <Modal visible={isModalVisible} transparent animationType="fade">
-        <View style={styles.modalOverlay}>
-         <View style={styles.modalContainer}>
-          {comandaSelecionada && (
-            <>
-              <Text style={styles.modalTitle}>Detalhes da Comanda</Text>
-              <Text style={styles.modalText}>ID: {comandaSelecionada.id}</Text>
-              <Text style={styles.modalText}>Nome: {comandaSelecionada.nome}</Text>
-              <Text style={styles.modalText}>Situação: {comandaSelecionada.situacao}</Text>
-              <Text style={styles.modalText}>Valor: R$ {comandaSelecionada.valor}</Text>
-              <Text style={styles.modalText}>ID Funcionário: {comandaSelecionada.idFuncionario}</Text>
-              <Text style={styles.modalText}>ID Pedido: {comandaSelecionada.idPedido}</Text>
-
-              <View style={styles.modalButtons}>
-                <TouchableOpacity
-                  style={[styles.modalButton, { backgroundColor: '#fff', borderColor: '#000', borderWidth: 1 }]}
-                  onPress={() => setIsModalVisible(false)}
-                >
-                  <Text style={styles.modalFecharText}>Fechar</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={[styles.modalButton, { backgroundColor: '#000' }]}
-                  onPress={encerrarComanda}
-                >
-                  <Text style={styles.modalButtonText}>Encerrar</Text>
-                </TouchableOpacity>
-              </View>
-            </>
-          )}
-         </View>
-        </View>
-      </Modal>
-
       {/* Modal Criar Comanda */}
       <Modal visible={isCriarModalVisible} transparent animationType="fade">
-      <View style={styles.modalOverlay}>
-        <View style={styles.modalContainer}>
-          <Text style={styles.modalTitle}>Criar Nova Comanda</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Nome da Comanda"
-            value={novaComandaNome}
-            onChangeText={setNovaComandaNome}
-          />
-          <View style={styles.modalButtons}>
-            <TouchableOpacity
-              style={[styles.modalButton, { backgroundColor: '#fff', borderColor: '#000', borderWidth: 1 }]}
-              onPress={() => setIsCriarModalVisible(false)}
-            >
-              <Text style={styles.modalFecharText}>Cancelar</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[styles.modalButton, { backgroundColor: '#000' }]}
-              onPress={criarComanda}
-            >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContainer}>
+            <Text style={styles.modalTitle}>Criar Nova Comanda</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Nome da Comanda"
+              value={novaComanda.nome}
+              onChangeText={(text) =>
+                setNovaComanda({ ...novaComanda, nome: text })
+              }
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Valor da Comanda"
+              keyboardType="numeric"
+              value={novaComanda.valor}
+              onChangeText={(text) =>
+                setNovaComanda({ ...novaComanda, valor: text })
+              }
+            />
+            <TouchableOpacity style={styles.modalButton} onPress={criarComanda}>
               <Text style={styles.modalButtonText}>Criar</Text>
             </TouchableOpacity>
           </View>
         </View>
+      </Modal>
+
+      {/* Modal Detalhes da Comanda */}
+      <Modal visible={isModalVisible} transparent animationType="fade">
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContainer}>
+            {comandaSelecionada && (
+              <>
+                <Text style={styles.modalTitle}>Detalhes da Comanda</Text>
+                <Text style={styles.modalText}>
+                  Nome: {comandaSelecionada.nomecomanda}
+                </Text>
+                <Text style={styles.modalText}>
+                  Valor: R$ {comandaSelecionada.valorcomanda}
+                </Text>
+                <Text style={styles.modalText}>
+                  Situação: {comandaSelecionada.situacaocomanda}
+                </Text>
+                <TouchableOpacity
+                  style={styles.modalButton}
+                  onPress={encerrarComanda}
+                >
+                  <Text style={styles.modalButtonText}>Encerrar</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.modalButton}
+                  onPress={() => deletarComanda(comandaSelecionada.id)}
+                >
+                  <Text style={styles.modalButtonText}>Deletar</Text>
+                </TouchableOpacity>
+              </>
+            )}
+          </View>
         </View>
       </Modal>
     </View>
