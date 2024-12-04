@@ -2,7 +2,6 @@ import { Request, Response } from "express";
 import { produtosModel } from "../models/ProdutosModel";
 import { Op } from "sequelize";
 
-// Buscar todos os produtos
 export const findAll = async (req: Request, res: Response): Promise<void> => {
   try {
     const produtos = await produtosModel.findAll();
@@ -18,7 +17,6 @@ export const findByPk = async (req: Request, res: Response, id: number) => {
   res.json(produtos);
 };
 
-// Criar um novo produto
 export const createNewProduct = async (req: Request, res: Response): Promise<void> => {
   try {
     const { nomeproduto, descricao, categoria, valorproduto, imagem } = req.body;
@@ -38,10 +36,9 @@ export const createNewProduct = async (req: Request, res: Response): Promise<voi
   }
 };
 
-// Atualizar um produto
 export const updateProduct = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { id } = req.params;
+    const idproduto = req.params.id;
     const { nomeproduto, descricao, categoria, valorproduto , imagem } = req.body;
 
     const updatedProduct = await produtosModel.update(
@@ -55,7 +52,7 @@ export const updateProduct = async (req: Request, res: Response): Promise<void> 
       {
         where: {
           idproduto: {
-            [Op.eq]: id,
+            [Op.eq]: idproduto,
           },
         },
       }
@@ -72,15 +69,13 @@ export const updateProduct = async (req: Request, res: Response): Promise<void> 
   }
 };
 
-// Excluir um produto
 export const deleteProduct = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { id } = req.params;
-
+    const idproduto = req.params.id;
     const deletedProduct = await produtosModel.destroy({
       where: {
         idproduto: {
-          [Op.eq]: id,
+          [Op.eq]: idproduto,
         },
       },
     });

@@ -3,8 +3,13 @@ import { funcionariosModel } from "../models/FuncionariosModel";
 import { Op } from "sequelize";
 
 export const findAll = async (req: Request, res: Response) => {
-  const funcionarios = await funcionariosModel.findAll();
-  res.json(funcionarios);
+  try {
+    const funcionarios = await funcionariosModel.findAll();
+    res.json(funcionarios);
+  } catch (error) {
+    console.error("Erro ao buscar funcionarios:", error);
+    res.status(500).json({ error: "Erro ao buscar funcionarios" });
+  }
 };
 
 export const findByPk = async (req: Request, res: Response, id: number) => {
@@ -14,14 +19,7 @@ export const findByPk = async (req: Request, res: Response, id: number) => {
 
 export const createNewEmployee = async (req: Request, res: Response): Promise<void> => {
   try {
-    const {
-      idfuncionario,
-      nomefuncionario,
-      salario,
-      datacontratacao,
-      datademissao,
-      situacaofuncionario
-    } = req.body;
+    const { idfuncionario, nomefuncionario, salario, datacontratacao, datademissao, situacaofuncionario } = req.body;
 
     const newEmployee = await funcionariosModel.create({
       idfuncionario,
@@ -42,12 +40,8 @@ export const createNewEmployee = async (req: Request, res: Response): Promise<vo
 export const updateEmployee = async (req: Request, res: Response): Promise<void> => {
   try {
     const idfuncionario = req.params.id;
-    const {
-        nomefuncionario,
-        salario,
-        datacontratacao,
-        datademissao,
-        situacaofuncionario, } = req.body;
+    const { nomefuncionario, salario,  datacontratacao, datademissao, situacaofuncionario, } = req.body;
+
     const updateEmployee = await funcionariosModel.update(
       {
         nomefuncionario,
@@ -64,11 +58,15 @@ export const updateEmployee = async (req: Request, res: Response): Promise<void>
         },
       }
     );
-    res.status(201).json({ updateEmployee });
-  } catch (error) {
-    console.error("Erro ao criar usuário:", error);
-    res.status(500).json({ error: "Erro ao criar usuário" });
-  }
+    if (updateEmployee[0] > 0) {
+          res.status(200).json({ message: "Funcionário atualizado com sucesso" });
+        } else {
+          res.status(404).json({ error: "Funcionário não encontrado" });
+        }
+      } catch (error) {
+        console.error("Erro ao atualizar funcionário:", error);
+        res.status(500).json({ error: "Erro ao atualizar funcionário" });
+      }
 };
 
 export const deleteEmployee = async (req: Request, res: Response): Promise<void> => {
@@ -81,9 +79,13 @@ export const deleteEmployee = async (req: Request, res: Response): Promise<void>
         },
       },
     });
-    res.status(201).json({ deleteEmployee });
+    if (deleteEmployee > 0) {
+      res.status(200).json({ message: "Funcionário excluído com sucesso" });
+    } else {
+      res.status(404).json({ error: "Funcionário não encontrado" });
+    }
   } catch (error) {
-    console.error("Erro ao criar usuário:", error);
-    res.status(500).json({ error: "Erro ao criar usuário" });
+    console.error("Erro ao excluir funcionário:", error);
+    res.status(500).json({ error: "Erro ao excluir funcionário" });
   }
 };

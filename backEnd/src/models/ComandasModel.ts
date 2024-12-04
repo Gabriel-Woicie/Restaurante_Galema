@@ -3,7 +3,7 @@ import { sequelize } from "../instances/pg";
 
 export interface ComandaInstance extends Model {
   idcomanda: number;
-  situacaocomanda: boolean;  // Alterado para booleano
+  situacaocomanda: boolean;
   valorcomanda: number;
   idmesa: number;
   idfuncionario: number;

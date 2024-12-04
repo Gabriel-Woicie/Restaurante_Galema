@@ -67,3 +67,27 @@ VALUES
 INSERT INTO usuarios (login, senha, idfuncionario)
 VALUES
   ('galema', '123', 1)
+  
+  
+CREATE OR REPLACE FUNCTION verificar_login(usuario VARCHAR(50), senha1 VARCHAR(20))
+RETURNS BOOLEAN AS
+$$
+DECLARE
+    resultado BOOLEAN;
+BEGIN
+    IF EXISTS (
+        SELECT 1
+        FROM usuarios
+        WHERE login = usuario AND senha = senha1
+    ) THEN
+        resultado := TRUE;
+    ELSE
+        resultado := FALSE;
+    END IF;
+    RETURN resultado;
+END;
+$$
+LANGUAGE plpgsql;
+
+SELECT * FROM verificar_login('anacosta', 'password');
+
