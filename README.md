@@ -32,6 +32,8 @@ BACK END -
 
 .'npm i'
 
+.'npm install --save-dev @types/pg'
+
 .'npm run start-dev'
 
 FRONT END -
