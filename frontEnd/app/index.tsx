@@ -15,42 +15,25 @@ export default function LoginScreen() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
     if (!username || !password) {
       Alert.alert('Erro', 'Por favor, preencha todos os campos.');
       return;
     }
 
-    // Simula validação
-    if (username === 'admin' && password === '123') {
-      console.log('Login bem-sucedido');
-      router.replace('/home');
-    } else {
-      Alert.alert('Erro', 'Usuário ou senha inválidos.');
-      console.log('Login falhou');
-    }
+    try {
+      const response = await fetch(`http://192.168.3.29:4005/verificarLogin?usuario=${username}&senha=${password}`);
+      const data = await response.json();
 
-    // Requisição ao backend (comentado por enquanto)
-    /*
-    fetch('http://seu-servidor/api/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username, password }),
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        if (data.success) {
-          Alert.alert('Sucesso', 'Login realizado com sucesso!');
-          // Redirecionar para a próxima tela
-        } else {
-          Alert.alert('Erro', 'Usuário ou senha inválidos.');
-        }
-      })
-      .catch((error) => {
-        console.error('Erro ao fazer login:', error);
-        Alert.alert('Erro', 'Não foi possível conectar ao servidor.');
-      });
-    */
+      if (response.ok && data.success) {
+        router.replace('/home');
+      } else {
+        Alert.alert('Erro', data.message || 'Usuário ou senha inválidos.');
+      }
+    } catch (error) {
+      Alert.alert('Erro', 'Não foi possível realizar o login. Tente novamente mais tarde.');
+      console.error(error);
+    }
   };
 
   const backgroundImage = require('../assets/images/backg.jpg');
@@ -93,10 +76,9 @@ export default function LoginScreen() {
         />
 
         {/* Login Button */}
-        <TouchableOpacity style={styles.loginButton} onPress={() => router.replace('/home')} >
+        <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
           <Text style={styles.loginButtonText}>Login</Text>
         </TouchableOpacity>
-
       </View>
     </View>
   );

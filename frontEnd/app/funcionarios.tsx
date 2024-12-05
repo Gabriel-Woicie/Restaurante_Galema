@@ -24,7 +24,7 @@ export default function FuncionariosScreen() {
 
   const [selectedFuncionario, setSelectedFuncionario] = useState<Funcionario | null>(null);
 
-  const BASE_URL = 'http://172.20.163.160:4005/funcionario'; // Substitua pelo IP correto
+  const BASE_URL = 'http://192.168.3.29:4005/funcionario'; // Substitua pelo IP correto
 
   // Buscar todos os funcionários
   const fetchFuncionarios = async () => {
@@ -55,7 +55,7 @@ export default function FuncionariosScreen() {
       newFuncionario.salario.trim()
     ) {
       try {
-        const response = await axios.post("http://172.20.163.160:4005/funcionario", {
+        const response = await axios.post("http://192.168.3.29:4005/funcionario", {
           nomefuncionario: newFuncionario.nome,
           salario: newFuncionario.salario,
           datacontratacao: newFuncionario.dataContratacao,
@@ -82,7 +82,7 @@ export default function FuncionariosScreen() {
     if (selectedFuncionario) {
       try {
         const response = await axios.put(
-          `http://172.20.163.160:4005/funcionario/${selectedFuncionario.id}`,
+          `http://192.168.3.29:4005/funcionario/${selectedFuncionario.id}`,
           {
             nomefuncionario: selectedFuncionario.nome,
             salario: selectedFuncionario.salario,
@@ -112,7 +112,7 @@ export default function FuncionariosScreen() {
     if (selectedFuncionario) {
       try {
         const response = await axios.delete(
-          `http://172.20.163.160:4005/funcionario/${selectedFuncionario.id}`
+          `http://192.168.3.29:4005/funcionario/${selectedFuncionario.id}`
         );
         if (response.status === 200) {
           alert("Funcionário excluído com sucesso!");

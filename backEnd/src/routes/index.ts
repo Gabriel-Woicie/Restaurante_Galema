@@ -4,6 +4,7 @@ import { Client } from "pg";
 import * as ProdutosController from "../controllers/ProdutosController";
 import * as FuncionariosController from "../controllers/FuncionariosController";
 import * as ComandasController from "../controllers/ComandasController";
+import * as ProdutosComandaController from "../controllers/ProdutosComandaController";
 
 const router = Router();
 
@@ -97,5 +98,17 @@ router.get("/comandas/:id", (req: Request, res: Response) => {
 router.post("/comandas", ComandasController.createNewComanda);
 router.put("/comandas/:id", ComandasController.updateComanda);
 router.delete("/comandas/:id", ComandasController.deleteComanda);
+
+// ProdutosComanda routes
+router.get("/produtoscomanda", ProdutosComandaController.findAll);
+
+router.get("/produtoscomanda/:id", (req: Request, res: Response) => {
+  const id = parseInt(req.params.id);
+  ProdutosComandaController.findByPk(req, res, id);
+});
+
+router.post("/produtoscomanda", ProdutosComandaController.createNewProdutoComanda);
+router.put("/produtoscomanda/:id", ProdutosComandaController.updateProdutoComanda);
+router.delete("/produtoscomanda/:id", ProdutosComandaController.deleteProdutoComanda);
 
 export default router;

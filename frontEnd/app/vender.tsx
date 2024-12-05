@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import axios from 'axios';
 import { View, Text, TouchableOpacity, StyleSheet, FlatList, Image, Modal } from 'react-native';
 import { useRouter } from 'expo-router';
 import { usePedido } from '../context/PedidoContext'; // Importando o contexto
@@ -10,20 +11,22 @@ export default function VenderScreen() {
   const [isModalVisible, setIsModalVisible] = useState(false);
 
   useEffect(() => {
-    // Mock de produtos
-    const produtosMockados = [
-      { idproduto: 1, nomeproduto: 'Chopp Brahma', valorproduto: 16.0 },
-      { idproduto: 2, nomeproduto: 'Caipirinhas', valorproduto: 25.0 },
-      { idproduto: 3, nomeproduto: 'Filé de Tilápia', valorproduto: 32.5 },
-      { idproduto: 4, nomeproduto: 'Chandon', valorproduto: 180.0 },
-      { idproduto: 5, nomeproduto: 'Batata Frita', valorproduto: 12.0 },
-      { idproduto: 6, nomeproduto: 'Cerveja Heineken', valorproduto: 8.0 },
-      { idproduto: 7, nomeproduto: 'Coca-Cola', valorproduto: 5.0 },
-      { idproduto: 8, nomeproduto: 'Água Mineral', valorproduto: 3.5 },
-      { idproduto: 9, nomeproduto: 'Café Expresso', valorproduto: 3.0 },
-      { idproduto: 10, nomeproduto: 'Bolo de Chocolate', valorproduto: 6.0 },
-    ];
-    setProdutos(produtosMockados);
+    const fetchProdutos = async () => {
+      try {
+        const response = await axios.get('http://192.168.3.29:4005/produtos');
+        const produtosData = response.data.map((produto: any) => ({
+          idproduto: produto.idproduto,
+          nomeproduto: produto.nomeproduto,
+          valorproduto: parseFloat(produto.valorproduto),
+          imagem: produto.imagem.replace(/['"]+/g, ''), // Remover aspas adicionais na URL
+        }));
+        setProdutos(produtosData);
+      } catch (error) {
+        console.error('Erro ao buscar produtos:', error);
+      }
+    };
+
+    fetchProdutos();
   }, []);
 
   const adicionarAoPedido = (produto: { idproduto: number; nomeproduto: string; valorproduto: number; quantidade?: number }) => {
@@ -61,7 +64,7 @@ export default function VenderScreen() {
     const quantidade = pedido.find((p) => p.idproduto === item.idproduto)?.quantidade || 0;
     return (
       <TouchableOpacity style={styles.card} onPress={() => adicionarAoPedido(item)}>
-        <Image source={{ uri: 'https://via.placeholder.com/100' }} style={styles.image} />
+        <Image source={{ uri: item.imagem }} style={styles.productImage} />
         <Text style={styles.nome}>{item.nomeproduto}</Text>
         <Text style={styles.valor}>R$ {item.valorproduto.toFixed(2)}</Text>
         {quantidade > 0 && (
@@ -142,6 +145,13 @@ export default function VenderScreen() {
 }
 
 const styles = StyleSheet.create({
+  productImage: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    marginBottom: 10,
+    backgroundColor: '#ddd',
+  },
   list: {
     padding: 10,
   },

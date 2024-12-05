@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
+import { useRouter } from 'expo-router';
 import axios from 'axios';
 import { View, Alert, Text, TouchableOpacity, FlatList, StyleSheet, Modal, TextInput } from 'react-native';
+import { useComanda } from '../context/ComandaContext';
 
 const ComandasMain = () => {
   interface Comanda {
@@ -8,9 +10,9 @@ const ComandasMain = () => {
     situacaocomanda: boolean;
     valorcomanda: string;
     nomecomanda: string;
-    idfuncionario: number;
   }
-
+  const router = useRouter();
+  const { setIdComandaSelecionada } = useComanda();
   const [comandas, setComandas] = useState<Comanda[]>([]);
   const [toggleAtivo, setToggleAtivo] = useState(true); // Estado do toggle bar
   const [paginaAtual, setPaginaAtual] = useState(1); // Página atual
@@ -24,7 +26,7 @@ const ComandasMain = () => {
   useEffect(() => {
     const fetchComandas = async () => {
       try {
-        const response = await axios.get('http://172.20.163.160:4005/comandas');
+        const response = await axios.get('http://192.168.3.29:4005/comandas');
         setComandas(response.data);
       } catch (error) {
         Alert.alert("Erro", "Não foi possível buscar as comandas.");
@@ -51,11 +53,10 @@ const ComandasMain = () => {
     }
 
     try {
-      const response = await axios.post("http://172.20.163.160:4005/comandas", {
+      const response = await axios.post("http://192.168.3.29:4005/comandas", {
         nomecomanda: novaComanda.nome,
         situacaocomanda: true,
         valorcomanda: parseFloat(novaComanda.valor),
-        idfuncionario: 1, // Substituir com o ID real do funcionário
       });
       setComandas([response.data, ...comandas]);
       setNovaComanda({ nome: "", valor: "" });
@@ -69,7 +70,7 @@ const ComandasMain = () => {
   const encerrarComanda = async (comandaSelecionada: Comanda) => {
     try {
       await axios.put(
-        `http://172.20.163.160:4005/comandas/${comandaSelecionada.idcomanda}`,
+        `http://192.168.3.29:4005/comandas/${comandaSelecionada.idcomanda}`,
         { situacaocomanda: false }
       );
       setComandas((prev) =>
@@ -88,7 +89,7 @@ const ComandasMain = () => {
 
   const deletarComanda = async (id: number) => {
     try {
-      await axios.delete(`http://172.20.163.160:4005/comandas/${id}`);
+      await axios.delete(`http://192.168.3.29:4005/comandas/${id}`);
       setComandas((prev) => prev.filter((c) => c.idcomanda !== id));
       Alert.alert("Sucesso", "Comanda deletada com sucesso.");
     } catch (error) {
@@ -203,6 +204,15 @@ const ComandasMain = () => {
                 <TouchableOpacity style={styles.modalButton} onPress={() => encerrarComanda(comandaSelecionada)}>
                   <Text style={styles.modalButtonText}>Encerrar</Text>
                 </TouchableOpacity>
+                <TouchableOpacity
+                style={styles.modalButton}
+                onPress={() => {
+                  setIdComandaSelecionada(comandaSelecionada.idcomanda); // Salva o ID no contexto
+                  router.push('/pedido'); // Navega para a tela de pedidos
+                }}
+              >
+                <Text style={styles.modalButtonText}>Ir para Pedidos</Text>
+              </TouchableOpacity>
                 <TouchableOpacity style={styles.modalButton} onPress={() => setIsModalVisible(false)}>
                   <Text style={styles.modalButtonText}>Fechar</Text>
                 </TouchableOpacity>

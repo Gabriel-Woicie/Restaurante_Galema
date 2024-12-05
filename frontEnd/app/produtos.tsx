@@ -13,12 +13,12 @@ export default function ProdutosScreen() {
   const [isExcluirModalVisible, setIsExcluirModalVisible] = useState(false);
 
   const [produtoSelecionado, setProdutoSelecionado] = useState<{ idproduto: number; nomeproduto: string; descricao: string; categoria: boolean; valorproduto: number; imagem: string } | null>(null);
-  const [novoProduto, setNovoProduto] = useState({ nomeproduto: '', descricao: '', categoria: false, valorproduto: 0, imagem: '' });
+  const [novoProduto, setNovoProduto] = useState({ nomeproduto: '', descricao: '', categoria: '', valorproduto: '', imagem: '' });
 
   // Fetch inicial para obter os produtos
   const fetchProdutos = async () => {
     try {
-      const response = await fetch('http://172.20.163.160:4005/produtos');
+      const response = await fetch('http://192.168.3.29:4005/produtos');
       const data = await response.json();
       const produtosFormatados = data.map((produto: any) => ({
         id: produto.idproduto,
@@ -26,7 +26,7 @@ export default function ProdutosScreen() {
         descricao: produto.descricao,
         categoria: produto.categoria,
         valor: parseFloat(produto.valorproduto),
-        imagem: produto.imagem.replace(/['"]+/g, ''), // Remover aspas adicionais na URL
+        imagem: produto.imagem,
       }));
       setProdutos(produtosFormatados);
     } catch (error) {
@@ -41,7 +41,7 @@ export default function ProdutosScreen() {
   // Função para lidar com a criação de produto
   const criarProduto = async (novoProduto: { nomeproduto: string; descricao: string; categoria: boolean; valorproduto: number; imagem: string }) => {
     try {
-      await fetch('http://172.20.163.160:4005/produtos', {
+      await fetch('http://192.168.3.29:4005/produtos', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(novoProduto),
@@ -54,15 +54,37 @@ export default function ProdutosScreen() {
   };
 
   // Função para abrir o modal de edição
-  const abrirEditarModal = (produto: any) => {
+  interface Produto {
+    id: number;
+    nome: string;
+    descricao: string;
+    categoria: boolean;
+    valor: number;
+    imagem: string;
+  }
+
+  const abrirEditarModal = (produto: Produto) => {
+      setProdutoSelecionado({
+          idproduto: produto.id,
+          nomeproduto: produto.nome,
+          descricao: produto.descricao,
+          categoria: produto.categoria,
+          valorproduto: produto.valor,
+          imagem: produto.imagem,
+      });
+      setIsEditarModalVisible(true);
+  };
+
+  // Função para abrir o modal de exclusão
+  const abrirExcluirModal = (produto: any) => {
     setProdutoSelecionado(produto);
-    setIsEditarModalVisible(true);
+    setIsExcluirModalVisible(true);
   };
 
   // Função para editar produto
   const editarProduto = async () => {
     try {
-      const response = await fetch(`http://172.20.163.160:4005/produtos/${produtoSelecionado?.idproduto}`, {
+      const response = await fetch(`http://192.168.3.29:4005/produtos/${produtoSelecionado?.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(produtoSelecionado),
@@ -97,7 +119,7 @@ export default function ProdutosScreen() {
 // Excluir Produto
 const excluirProduto = async () => {
   try {
-    const response = await fetch(`http://172.20.163.160:4005/produtos/${produtoSelecionado?.idproduto}`, {
+    const response = await fetch(`http://192.168.3.29:4005/produtos/${produtoSelecionado?.id}`, {
       method: 'DELETE',
     });
     if (response.ok) {
@@ -137,7 +159,7 @@ const excluirProduto = async () => {
                 <Icon name="glass-cocktail" size={24} color="#000" />
               )}
             </View>
-            <Image source={{ uri: item.imagem }} style={styles.productImage} />
+            <Image key={item.id} source={{ uri: item.imagem }} style={styles.productImage} />
             <Text style={styles.productName}>{item.nome}</Text>
             <Text style={styles.productDescription}>{item.descricao}</Text>
             <View style={styles.cardActions}>
@@ -194,14 +216,14 @@ const excluirProduto = async () => {
         style={styles.input}
         placeholder="Categoria (true ou false)"
         value={String(novoProduto.categoria)}
-        onChangeText={(text) => setNovoProduto({ ...novoProduto, categoria: text === 'true' })}
+        onChangeText={(text) => setNovoProduto({ ...novoProduto, categoria: text })}
       />
       <TextInput
         style={styles.input}
         placeholder="Valor"
         keyboardType="numeric"
         value={String(novoProduto.valorproduto)}
-        onChangeText={(text) => setNovoProduto({ ...novoProduto, valorproduto: parseFloat(text) })}
+        onChangeText={(text) => setNovoProduto({ ...novoProduto, valorproduto: text })}
       />
       <TextInput
         style={styles.input}
@@ -210,7 +232,11 @@ const excluirProduto = async () => {
         onChangeText={(text) => setNovoProduto({ ...novoProduto, imagem: text })}
       />
       <View style={styles.modalActions}>
-        <TouchableOpacity style={styles.modalButton} onPress={() => criarProduto(novoProduto)}>
+        <TouchableOpacity style={styles.modalButton} onPress={() => criarProduto({
+          ...novoProduto,
+          categoria: novoProduto.categoria.toLowerCase() === 'true',
+          valorproduto: parseFloat(novoProduto.valorproduto)
+        })}>
           <Text style={styles.modalButtonTextSecondary}>Salvar</Text>
         </TouchableOpacity>
         <TouchableOpacity
@@ -244,8 +270,8 @@ const excluirProduto = async () => {
       <TextInput
         style={styles.input}
         placeholder="Categoria (true ou false)"
-        value={produtoSelecionado?.categoria ? 'true' : 'false'}
-        onChangeText={(text) => setProdutoSelecionado(produtoSelecionado ? { ...produtoSelecionado, categoria: text === 'true' } : null)}
+        value={produtoSelecionado?.categoria || ''} 
+        onChangeText={(text) => setProdutoSelecionado(produtoSelecionado ? { ...produtoSelecionado, categoria: text.toLowerCase() === 'true' } : null)}
       />
       <TextInput
         style={styles.input}
@@ -253,14 +279,14 @@ const excluirProduto = async () => {
         keyboardType="numeric"
         value={String(produtoSelecionado?.valorproduto || '')}
         onChangeText={(text) =>
-          setProdutoSelecionado({ ...produtoSelecionado, valorproduto: parseFloat(text) })
+          setProdutoSelecionado(produtoSelecionado ? { ...produtoSelecionado, valorproduto: text } : null)
         }
       />
       <TextInput
         style={styles.input}
         placeholder="Endereço da Imagem"
         value={produtoSelecionado?.imagem || ''}
-        onChangeText={(text) => setProdutoSelecionado({ ...produtoSelecionado, imagem: text })}
+        onChangeText={(text) => setProdutoSelecionado(produtoSelecionado ? { ...produtoSelecionado, imagem: text } : null)}
       />
       <View style={styles.modalActions}>
         <TouchableOpacity style={styles.modalButton} onPress={editarProduto}>
@@ -283,7 +309,7 @@ const excluirProduto = async () => {
     <View style={styles.modalContainer}>
       <Text style={styles.modalTitle}>Confirmação</Text>
       <Text style={styles.modalText}>
-        Deseja realmente excluir o produto "{produtoSelecionado?.nomeproduto}"?
+        Deseja realmente excluir o produto "{produtoSelecionado?.nome}"?
       </Text>
       <View style={styles.modalActions}>
         <TouchableOpacity style={styles.modalButton} onPress={excluirProduto}>

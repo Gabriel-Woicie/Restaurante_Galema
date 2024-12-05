@@ -19,14 +19,13 @@ export const findByPk = async (req: Request, res: Response, id: number) => {
 
 export const createNewComanda = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { nomecomanda, idcomanda, situacaocomanda, valorcomanda, idfuncionario, idpedido } = req.body;
+    const { nomecomanda, idcomanda, situacaocomanda, valorcomanda, } = req.body;
 
     const newComanda = await comandasModel.create({
       nomecomanda,
       idcomanda,
       situacaocomanda,
       valorcomanda,
-      idfuncionario,
     });
 
     res.status(201).json({ newComanda });
@@ -39,15 +38,13 @@ export const createNewComanda = async (req: Request, res: Response): Promise<voi
 export const updateComanda = async (req: Request, res: Response): Promise<void> => {
   try {
     const idcomanda = req.params.id;
-    const { nomecomanda, situacaocomanda, valorcomanda, idfuncionario, idpedido } = req.body;
+    const { nomecomanda, situacaocomanda, valorcomanda, } = req.body;
 
     const updateComanda = await comandasModel.update(
       {
         nomecomanda,
         situacaocomanda,
         valorcomanda,
-        idfuncionario,
-        idpedido,
       },
       {
         where: {

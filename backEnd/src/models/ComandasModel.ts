@@ -29,14 +29,6 @@ export const comandasModel = sequelize.define<ComandaInstance>(
       allowNull: false,
       type: DataTypes.STRING(100),
     },
-    idfuncionario: {
-      allowNull: false,
-      type: DataTypes.INTEGER,
-      references: {
-        model: "funcionarios",
-        key: "idfuncionario",
-      },
-    },
   },
   {
     tableName: "comandas",

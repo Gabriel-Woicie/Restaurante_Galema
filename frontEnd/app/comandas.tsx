@@ -5,7 +5,7 @@ import { useRouter } from 'expo-router';
 import axios from 'axios';
 
 export default function ComandasScreen() {
-  const { totalPrice } = usePedido();
+  const { totalPrice, pedido, limparPedido } = usePedido();
   const router = useRouter();
 
   const [comandas, setComandas] = useState<{ idcomanda: number; nomecomanda: string; situacaocomanda: boolean }[]>([]);
@@ -23,7 +23,7 @@ export default function ComandasScreen() {
 
   const fetchComandas = async () => {
     try {
-      const response = await axios.get('http://172.20.163.160:4005/comandas');
+      const response = await axios.get('http://192.168.3.29:4005/comandas');
       const activeComandas = response.data.filter((comanda: { situacaocomanda: boolean }) => comanda.situacaocomanda);
       setComandas(activeComandas);
     } catch (error) {
@@ -42,9 +42,8 @@ export default function ComandasScreen() {
         nomecomanda: newComandaName,
         situacaocomanda: true,
         valorcomanda: null,
-        idfuncionario: 1,
       };
-      await axios.post('http://172.20.163.160:4005/comandas', newComanda);
+      await axios.post('http://192.168.3.29:4005/comandas', newComanda);
       setIsCreateModalVisible(false);
       setNewComandaName('');
       fetchComandas();
@@ -54,6 +53,33 @@ export default function ComandasScreen() {
   };
 
   const currentData = comandas.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
+
+  const handleGravarProdutos = async (idComanda: number) => {
+    try {
+      // Itera sobre o pedido atual para enviar cada item ao banco
+      const requests = pedido.map((item) =>
+        axios.post('http://192.168.3.29:4005/produtoscomanda', {
+          idcomanda: idComanda,
+          idproduto: item.idproduto,
+          itemqtdade: item.quantidade,
+        })
+      );
+  
+      // Aguarda todas as requisições serem concluídas
+      await Promise.all(requests);
+  
+      // Limpa o pedido após gravar
+      limparPedido();
+  
+      // Fecha o modal e exibe uma mensagem de sucesso
+      setIsModalVisible(false);
+      alert('Pedido gravado com sucesso!');
+      router.dismissAll();
+    } catch (error) {
+      console.error('Erro ao gravar produtos na comanda:', error);
+      alert('Erro ao gravar os produtos. Tente novamente.');
+    }
+  };
 
   return (
     <View style={{ flex: 1, padding: 10 }}>
@@ -131,6 +157,12 @@ export default function ComandasScreen() {
               <>
                 <Text style={styles.modalText}>Comanda: {selectedComanda.nomecomanda}</Text>
                 <Text style={styles.modalText}>Total: R$ {totalPrice.toFixed(2)}</Text>
+                <TouchableOpacity
+                style={[styles.modalButton, { backgroundColor: '#4CAF50' }]}
+                onPress={() => handleGravarProdutos(selectedComanda.idcomanda)}
+                  >
+                <Text style={styles.modalButtonText}>Gravar Pedido</Text>
+                </TouchableOpacity>
                 <TouchableOpacity style={styles.modalButton} onPress={() => setIsModalVisible(false)}>
                   <Text style={styles.modalButtonText}>Fechar</Text>
                 </TouchableOpacity>
