@@ -17,13 +17,15 @@ export default function ComandasScreen() {
 
   const ITEMS_PER_PAGE = 10;
 
+  const URL = 'http://192.168.3.29:4005';
+
   useEffect(() => {
     fetchComandas();
   }, []);
 
   const fetchComandas = async () => {
     try {
-      const response = await axios.get('http://192.168.3.29:4005/comandas');
+      const response = await axios.get(`${URL}/comandas`);
       const activeComandas = response.data.filter((comanda: { situacaocomanda: boolean }) => comanda.situacaocomanda);
       setComandas(activeComandas);
     } catch (error) {
@@ -43,7 +45,7 @@ export default function ComandasScreen() {
         situacaocomanda: true,
         valorcomanda: null,
       };
-      await axios.post('http://192.168.3.29:4005/comandas', newComanda);
+      await axios.post(`${URL}/comandas`, newComanda);
       setIsCreateModalVisible(false);
       setNewComandaName('');
       fetchComandas();
@@ -58,7 +60,7 @@ export default function ComandasScreen() {
     try {
       // Itera sobre o pedido atual para enviar cada item ao banco
       const requests = pedido.map((item) =>
-        axios.post('http://192.168.3.29:4005/produtoscomanda', {
+        axios.post(`${URL}/produtoscomanda`, {
           idcomanda: idComanda,
           idproduto: item.idproduto,
           itemqtdade: item.quantidade,

@@ -1,135 +1,133 @@
-CREATE TABLE tiposrestaurantes(
-	idtiporestaurante SERIAL PRIMARY KEY,
-	nometiporestaurante VARCHAR(50) NOT NULL
+SELECT * FROM COMANDAS
+SELECT * FROM FUNCIONARIOS
+SELECT * FROM PRODUTOS
+SELECT * FROM USUARIOS
+SELECT * FROM PRODUTOSCOMANDA
+
+CREATE TABLE funcionarios (
+  idfuncionario SERIAL PRIMARY KEY,
+  nomefuncionario VARCHAR(255) NOT NULL,
+  salario DECIMAL NOT NULL,
+  datacontratacao DATE NOT NULL,
+  datademissao DATE,
+  situacaofuncionario INTEGER NOT NULL
 );
 
-CREATE TABLE restaurantes(
-	idrestaurante SERIAL PRIMARY KEY,
-	nomerestaurante VARCHAR(50) NOT NULL,
-	idtiporestaurante INTEGER REFERENCES tiposrestaurantes(idtiporestaurante)
+CREATE TABLE comandas (
+  idcomanda SERIAL PRIMARY KEY NOT NULL,
+  situacaocomanda BOOLEAN NOT NULL,
+  valorcomanda DECIMAL,
+  nomecomanda VARCHAR(100) NOT NULL
 );
 
-CREATE TABLE mesas(
-	idmesa SERIAL PRIMARY KEY,
-	situacaomesa INTEGER NOT NULL,
-	idrestaurante INTEGER REFERENCES restaurantes(idrestaurante)
+CREATE TABLE produtos (
+  idproduto SERIAL PRIMARY KEY NOT NULL,
+  nomeproduto VARCHAR(255) NOT NULL,
+  descricao VARCHAR(255),
+  categoria BOOLEAN NOT NULL,
+  valorproduto DECIMAL(10, 2) NOT NULL,
+  imagem VARCHAR(255)
 );
 
-CREATE TABLE funcionarios(
-	idfuncionario SERIAL PRIMARY KEY,
-	nomefuncionario VARCHAR(50) NOT NULL,
-	salario DECIMAL(10,2) NOT NULL,
-	datacontratacao DATE NOT NULL,
-	datademissao DATE,
-	cargo INTEGER NOT NULL,
-	situacaofuncionario INTEGER NOT NULL,
-	login VARCHAR(50) NOT NULL UNIQUE,
-	senha VARCHAR(20) NOT NULL,
-	idrestaurante INTEGER REFERENCES restaurantes(idrestaurante)
+CREATE TABLE usuarios (
+  idusuario SERIAL PRIMARY KEY,
+  login VARCHAR(50) NOT NULL,
+  senha VARCHAR(20) NOT NULL);
+  
+ 
+CREATE TABLE produtoscomanda (
+  idprodcomanda SERIAL PRIMARY KEY,
+  idcomanda INTEGER NOT NULL,
+  idproduto INTEGER NOT NULL,
+  itemqtdade INTEGER NOT NULL,
+  FOREIGN KEY (idcomanda) REFERENCES comandas(idcomanda),
+  FOREIGN KEY (idproduto) REFERENCES produtos(idproduto)
 );
 
-CREATE TABLE produtos(
-	idproduto SERIAL PRIMARY KEY,
-	nomeproduto VARCHAR(50) NOT NULL,
-	situacaoproduto INTEGER NOT NULL,
-	descricao VARCHAR(200),
-	categoria INTEGER NOT NULL,
-	valorproduto DECIMAL(10,2) NOT NULL,
-	idrestaurante INTEGER REFERENCES restaurantes(idrestaurante)
-);
 
-CREATE TABLE comandas(
-	idcomanda SERIAL PRIMARY KEY,
-	situacaocomanda INTEGER NOT NULL,
-	valorcomanda DECIMAL(10,2),
-	idmesa INTEGER REFERENCES mesas(idmesa),
-	idfuncionario INTEGER REFERENCES funcionarios(idfuncionario)
-);
+INSERT INTO funcionarios (nomefuncionario, salario, datacontratacao, datademissao, situacaofuncionario)
+VALUES
+  ('João Silva', 2500.50, '2022-06-01', NULL, 1),
+  ('Maria Oliveira', 3200.75, '2021-03-15', '2023-01-20', 0),
+  ('Carlos Souza', 2900.60, '2020-08-10', NULL, 1),
+  ('Ana Costa', 3500.40, '2023-02-01', NULL, 1),
+  ('Ricardo Pereira', 2800.00, '2022-11-10', NULL, 1);
 
-CREATE TABLE pedidos(
-	idpedido SERIAL PRIMARY KEY,
-	datapedido DATE NOT NULL,
-	valorpedido DECIMAL(10,2) NOT NULL,
-	situacaopedido INTEGER NOT NULL,
-	idcomanda INTEGER REFERENCES comandas(idcomanda)
-);
+INSERT INTO produtos (nomeproduto, descricao, categoria, valorproduto)
+VALUES
+  ('Café', 'Café preto', false, 5.00),
+  ('Refrigerante', 'Refrigerante sabor cola', false, 7.50),
+  ('Lanche', 'Lanche natural', true, 15.00),
+  ('Pizza', 'Pizza de calabresa', true, 30.00),
+  ('Suco', 'Suco de laranja', false, 6.00);
 
-CREATE TABLE itenspedidos(
-	iditempedido SERIAL PRIMARY KEY,
-	qtditempedido INTEGER NOT NULL,
-	itemsituacao INTEGER NOT NULL,
-	idproduto INTEGER REFERENCES produtos(idproduto),
-	idpedido INTEGER REFERENCES pedidos(idpedido)
-);
+INSERT INTO comandas (situacaocomanda, valorcomanda, nomecomanda)
+VALUES
+  (true, 00.00, 'maicon'),
+  (false, 00.00, 'joao'),
+  (true, 00.00, 'maria'),
+  (true, 00.00, 'carlos'),
+  (false, 00.00, 'gabriel');
 
--- TIPOS DE RESTAURANTE
-INSERT INTO tiposrestaurantes (nometiporestaurante) VALUES ('GOURMET'),('QUIOSQUE');
+INSERT INTO usuarios (login, senha)
+VALUES
+  ('galema', '123')
+  
+  
+INSERT INTO produtoscomanda (idcomanda, idproduto, itemqtdade) VALUES 
+(4, 2, 3), -- Comanda 1, Produto 2, Quantidade 3
+(4, 3, 5) -- Comanda 2, Produto 3, Quantidade 5
 
--- RESTAURANTES
-INSERT INTO restaurantes (nomerestaurante,idtiporestaurante) VALUES ('DEFAULT GOURMET', 1), ('DEFAULT QUIOSQUE', 2);
+INSERT INTO produtoscomanda (idcomanda, idproduto, itemqtdade) VALUES 
+(1, 2, 3), -- Comanda 1, Produto 2, Quantidade 3
+(2, 3, 5), -- Comanda 2, Produto 3, Quantidade 5
+(3, 1, 2), -- Comanda 3, Produto 1, Quantidade 2
+(1, 4, 1), -- Comanda 1, Produto 4, Quantidade 1
+(2, 5, 4); -- Comanda 2, Produto 5, Quantidade 4
 
--- MESAS
-INSERT INTO mesas (situacaomesa, idrestaurante) VALUES  (1,1), (1,1), (1,1), (1,1), (1,1), (1,2), (1,2), (1,2), (1,2), (1,2);
-
--- FUNCIONÁRIOS
--- SITUAÇÃO: 1 - ATIVO, 2 - INATIVO
--- CARGO: 1 - GERENTE, 2 - ATENDENTE, 3 - CAIXA, 4 - COZINHA
-
--- DEFAULT GOURMET
-INSERT INTO funcionarios (nomefuncionario,salario,datacontratacao,cargo,situacaofuncionario,login,senha,idrestaurante) VALUES
-('ÉRICK JACQUIN', 20000,'2023-09-01',1,1,'ERICK', 'ERICK123',1),('MARIA EDUARDA', 3000,'2023-09-10',2,1,'MARIA', 'MARIA123',1),
-('JOÃO PEDRO', 3500,'2023-09-11',3,1,'JOAO', 'JOAO123',1),('RENÊ VELMONT', 3750,'2023-09-12',4,1,'RENE', 'RENE123',1);
-
--- DEFAULT QUIOSQUE
-INSERT INTO funcionarios (nomefuncionario,salario,datacontratacao,cargo,situacaofuncionario,login,senha,idrestaurante) VALUES
-('HENRIQUE FOGAÇA', 15000,'2023-03-10',1,1,'HENRIQUE', 'HENRIQUE123',2),('GABRIEL MELO', 3500,'2023-05-01',2,1,'GABRIEL', 'GABRIEL123',2),
-('ISABELA DE OLIVEIRA', 3000,'2023-05-02',3,1,'ISABELA', 'ISABELA123',2),('ENRICO BOLGARI', 3750,'2023-05-03',4,1,'ENRICO', 'ENRICO123',2);
-
--- PRODUTOS
--- SITUAÇÃO: 1 - ATIVO, 2 - INATIVO
--- CATEGORIA: 1 - COMIDA, 2 - BEBIDAS, 3 - SOBREMESAS
-
--- DEFAULT GOURMET
-INSERT INTO produtos (nomeproduto, situacaoproduto, categoria, valorproduto, idrestaurante) VALUES 
-('RISOTO DE CAMARÃO',1,1,75,1),('VINHO LA ROMANÉE GRAND CRU',1,2,3000,1),('PETT GATEAU',1,3,30,1),
-('SPAGHETTI CARBONARA',1,1,45,1),('CHAMPAGNE CRISTAL LOUIS ROEDERER BRUT',1,2,2000,1),('CHEESECAKE',1,3,25,1);
-
--- DEFAULT QUIOSQUE
-INSERT INTO produtos (nomeproduto, situacaoproduto, categoria, valorproduto, idrestaurante) VALUES 
-('HAMBÚRGUER DE COSTELA',1,1,35,2),('CERVEJA RED ALE',1,2,20,2),('PUDIM',1,3,12,2),
-('PORÇÃO DE TILÁPIA',1,1,40,2),('COCA COLA LATA',1,2,5,2),('COCADA',1,3,10,2);
-
--- STORED PROCEDURE
-
--- STORED PROCEDURE LOGIN
-
-CREATE OR REPLACE FUNCTION public.verificar_login_senha(login_param VARCHAR(50), senha_param VARCHAR(20))
- RETURNS TABLE(cargo INTEGER, restaurante INTEGER,  login_correto BOOLEAN)
- LANGUAGE plpgsql
-AS $function$
+  
+CREATE OR REPLACE FUNCTION verificar_login(usuario VARCHAR(50), senha1 VARCHAR(20))
+RETURNS BOOLEAN AS
+$$
 DECLARE
-    cargo_funcionario 		INTEGER;
-   	restaurante_funcionario INTEGER;
+    resultado BOOLEAN;
 BEGIN
-    cargo_funcionario 		:= NULL;
-   	restaurante_funcionario := NULL;
-
-    SELECT f.cargo, f.idrestaurante INTO cargo_funcionario, restaurante_funcionario
-    FROM funcionarios f
-    INNER JOIN usuarios u ON f.idusuario = u.idusuario
-    WHERE u.login = login_param AND u.senha = senha_param AND f.situacaofuncionario = 1 AND f.cargo = 1  
-    LIMIT 1;
-
-    IF cargo_funcionario IS NOT NULL THEN
-        RETURN QUERY SELECT cargo_funcionario cargo, restaurante_funcionario restaurante, TRUE login_correto;
+    IF EXISTS (
+        SELECT 1
+        FROM usuarios
+        WHERE login = usuario AND senha = senha1
+    ) THEN
+        resultado := TRUE;
     ELSE
-        RETURN QUERY SELECT 0 cargo, 0 restaurante, FALSE login_correto;
+        resultado := FALSE;
     END IF;
-
+    RETURN resultado;
 END;
-$function$
-;
+$$
+LANGUAGE plpgsql;
 
-SELECT verificar_login_senha('ERICK', 'ERICK123')
+SELECT * FROM verificar_login('galema', '123');
 
--- FIM STORED PROCEDURE LOGIN
+-- Função que calcula e atualiza o valor total da comanda
+CREATE OR REPLACE FUNCTION atualizar_valor_comanda()
+RETURNS TRIGGER AS $$
+BEGIN
+  -- Atualiza o valor total da comanda
+  UPDATE comandas
+  SET valorcomanda = (
+    SELECT SUM(pc.itemqtdade * p.valorproduto)
+    FROM produtoscomanda pc
+    JOIN produtos p ON pc.idproduto = p.idproduto
+    WHERE pc.idcomanda = NEW.idcomanda
+  )
+  WHERE idcomanda = NEW.idcomanda;
+
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Trigger para executar a função após inserir ou atualizar na tabela produtoscomanda
+CREATE TRIGGER trigger_atualizar_valor_comanda
+AFTER INSERT OR UPDATE OR DELETE ON produtoscomanda
+FOR EACH ROW
+EXECUTE FUNCTION atualizar_valor_comanda();

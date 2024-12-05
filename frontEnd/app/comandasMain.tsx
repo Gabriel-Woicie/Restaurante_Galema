@@ -22,11 +22,12 @@ const ComandasMain = () => {
   const [novaComanda, setNovaComanda] = useState({ nome: "", valor: "" }); // Nova comanda
 
   const itensPorPagina = 20;
+  const URL = 'http://192.168.3.29:4005';
 
   useEffect(() => {
     const fetchComandas = async () => {
       try {
-        const response = await axios.get('http://192.168.3.29:4005/comandas');
+        const response = await axios.get(`${URL}/comandas`);
         setComandas(response.data);
       } catch (error) {
         Alert.alert("Erro", "Não foi possível buscar as comandas.");
@@ -53,7 +54,7 @@ const ComandasMain = () => {
     }
 
     try {
-      const response = await axios.post("http://192.168.3.29:4005/comandas", {
+      const response = await axios.post(`${URL}/comandas`, {
         nomecomanda: novaComanda.nome,
         situacaocomanda: true,
         valorcomanda: parseFloat(novaComanda.valor),
@@ -70,7 +71,7 @@ const ComandasMain = () => {
   const encerrarComanda = async (comandaSelecionada: Comanda) => {
     try {
       await axios.put(
-        `http://192.168.3.29:4005/comandas/${comandaSelecionada.idcomanda}`,
+        `${URL}/comandas/${comandaSelecionada.idcomanda}`,
         { situacaocomanda: false }
       );
       setComandas((prev) =>
@@ -89,7 +90,7 @@ const ComandasMain = () => {
 
   const deletarComanda = async (id: number) => {
     try {
-      await axios.delete(`http://192.168.3.29:4005/comandas/${id}`);
+      await axios.delete(`${URL}/comandas/${id}`);
       setComandas((prev) => prev.filter((c) => c.idcomanda !== id));
       Alert.alert("Sucesso", "Comanda deletada com sucesso.");
     } catch (error) {

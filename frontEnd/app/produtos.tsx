@@ -15,10 +15,12 @@ export default function ProdutosScreen() {
   const [produtoSelecionado, setProdutoSelecionado] = useState<{ idproduto: number; nomeproduto: string; descricao: string; categoria: boolean; valorproduto: number; imagem: string } | null>(null);
   const [novoProduto, setNovoProduto] = useState({ nomeproduto: '', descricao: '', categoria: '', valorproduto: '', imagem: '' });
 
+  const URL = 'http://192.168.3.29:4005';
+
   // Fetch inicial para obter os produtos
   const fetchProdutos = async () => {
     try {
-      const response = await fetch('http://192.168.3.29:4005/produtos');
+      const response = await fetch(`${URL}/produtos`);
       const data = await response.json();
       const produtosFormatados = data.map((produto: any) => ({
         id: produto.idproduto,
@@ -41,7 +43,7 @@ export default function ProdutosScreen() {
   // Função para lidar com a criação de produto
   const criarProduto = async (novoProduto: { nomeproduto: string; descricao: string; categoria: boolean; valorproduto: number; imagem: string }) => {
     try {
-      await fetch('http://192.168.3.29:4005/produtos', {
+      await fetch(`${URL}/produtos`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(novoProduto),
@@ -84,7 +86,7 @@ export default function ProdutosScreen() {
   // Função para editar produto
   const editarProduto = async () => {
     try {
-      const response = await fetch(`http://192.168.3.29:4005/produtos/${produtoSelecionado?.id}`, {
+      const response = await fetch(`${URL}/produtos/${produtoSelecionado?.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(produtoSelecionado),
@@ -119,7 +121,7 @@ export default function ProdutosScreen() {
 // Excluir Produto
 const excluirProduto = async () => {
   try {
-    const response = await fetch(`http://192.168.3.29:4005/produtos/${produtoSelecionado?.id}`, {
+    const response = await fetch(`${URL}/produtos/${produtoSelecionado?.id}`, {
       method: 'DELETE',
     });
     if (response.ok) {

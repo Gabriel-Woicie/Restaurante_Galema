@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { produtosComandaModel } from "../models/ProdutosComandaModel";
+import { produtosModel } from "../models/ProdutosModel";
 import { Op } from "sequelize";
 
 export const findAll = async (req: Request, res: Response) => {
@@ -84,5 +85,49 @@ export const deleteProdutoComanda = async (req: Request, res: Response): Promise
   } catch (error) {
     console.error("Erro ao excluir produto da comanda:", error);
     res.status(500).json({ error: "Erro ao excluir produto da comanda" });
+  }
+};
+
+export const findDetailsByComanda = async (req: Request, res: Response) => {
+  const { idcomanda } = req.params;
+
+  try {
+    // Buscar os produtos vinculados à comanda específica
+    const produtosComanda = await produtosComandaModel.findAll({
+      where: { idcomanda: idcomanda },
+    });
+
+    if (!produtosComanda.length) {
+      return res.status(404).json({ message: "Nenhum produto encontrado nesta comanda." });
+    }
+
+    // Obter os IDs dos produtos vinculados
+    const idsProdutos = produtosComanda.map((item) => item.idproduto);
+
+    // Buscar os detalhes dos produtos pelos IDs
+    const produtos = await produtosModel.findAll({
+      where: {
+        idproduto: {
+          [Op.in]: idsProdutos,
+        },
+      },
+    });
+
+    // Mapear os resultados para incluir os dados do produto e quantidade
+    const produtosDetalhes = produtosComanda.map((prodComanda) => {
+      const produto = produtos.find((prod) => prod.idproduto === prodComanda.idproduto);
+      return {
+        idprodcomanda: prodComanda.idprodcomanda,
+        idproduto: prodComanda.idproduto,
+        itemqtdade: prodComanda.itemqtdade,
+        nomeproduto: produto ? produto.nomeproduto : "Produto não encontrado",
+        valorproduto: produto ? produto.valorproduto : 0,
+      };
+    });
+
+    res.json(produtosDetalhes);
+  } catch (error) {
+    console.error("Erro ao buscar os detalhes dos produtos da comanda:", error);
+    res.status(500).json({ error: "Erro interno no servidor" });
   }
 };

@@ -28,11 +28,7 @@ cd Restaurante_Galema
 
 BACK END - 
 
-.'npm i -g nodemon typescript ts-node'
-
-.'npm i'
-
-.'npm install --save-dev @types/pg'
+.'npm install'
 
 .'npm run start-dev'
 

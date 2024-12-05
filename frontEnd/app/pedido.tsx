@@ -1,113 +1,137 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, FlatList, Alert, StyleSheet } from 'react-native';
+import {
+  View,
+  Text,
+  FlatList,
+  Alert,
+  StyleSheet,
+  TouchableOpacity,
+} from 'react-native';
 import axios from 'axios';
-import { useComanda } from '../context/ComandaContext'; // Importando o contexto para obter a comanda selecionada
+import { useComanda } from '../context/ComandaContext';
+import { useRouter } from 'expo-router';
 
 const Pedido = () => {
   const { idComandaSelecionada } = useComanda();
-  interface ProdutoComanda {
+
+  interface ProdutoComandaDetalhe {
     idprodcomanda: number;
     nomeproduto: string;
-    valorproduto: number;
     itemqtdade: number;
+    valorproduto: string;
   }
-  
-  const [produtosComanda, setProdutosComanda] = useState<ProdutoComanda[]>([]);
+  const router = useRouter();
+  const [produtosComandaDetalhes, setProdutosComandaDetalhes] = useState<ProdutoComandaDetalhe[]>([]);
   const [comandaInfo, setComandaInfo] = useState({ nomecomanda: '', valorcomanda: 0 });
+  const URL = 'http://192.168.3.29:4005';
 
   useEffect(() => {
     if (idComandaSelecionada) {
-      // Buscando os produtos da comanda
       axios
-        .get(`http://192.168.3.29:4005/produtoscomanda/${idComandaSelecionada}`)
+        .get(`${URL}/produtoscomanda/detalhes/${idComandaSelecionada}`)
         .then((response) => {
-          setProdutosComanda(response.data);
+          setProdutosComandaDetalhes(response.data);
         })
         .catch((error) => {
-          Alert.alert('Erro', 'Não foi possível carregar os produtos da comanda');
+          Alert.alert('Erro', 'Não foi possível carregar os produtos da comanda.');
           console.error(error);
         });
 
-      // Buscando informações da comanda (nome e valor)
       axios
-        .get(`http://192.168.3.29:4005/comandas/${idComandaSelecionada}`)
+        .get(`${URL}/comandas/${idComandaSelecionada}`)
         .then((response) => {
           setComandaInfo({
-          nomecomanda: response.data.nomecomanda,
-          valorcomanda: parseFloat(response.data.valorcomanda) || 0,
-        })
+            nomecomanda: response.data.nomecomanda,
+            valorcomanda: parseFloat(response.data.valorcomanda) || 0,
+          });
         })
         .catch((error) => {
-          Alert.alert('Erro', 'Não foi possível carregar os dados da comanda');
+          Alert.alert('Erro', 'Não foi possível carregar os dados da comanda.');
           console.error(error);
         });
     }
   }, [idComandaSelecionada]);
 
-  const atualizarQuantidade = async (idProdutoComanda: number, operacao: 'incrementar' | 'decrementar') => {
-    try {
-      const produtoComanda = produtosComanda.find((item) => item.idprodcomanda === idProdutoComanda);
-      if (!produtoComanda) {
-        Alert.alert('Erro', 'Produto não encontrado');
-        return;
+  const updateQuantity = (id: number, change: number) => {
+    const updatedProducts = produtosComandaDetalhes.map((item) => {
+      if (item.idprodcomanda === id) {
+        const newQuantity = item.itemqtdade + change;
+        return { ...item, itemqtdade: Math.max(newQuantity, 0) };
       }
-      const novaQtd = operacao === 'incrementar' ? produtoComanda.itemqtdade + 1 : produtoComanda.itemqtdade - 1;
+      return item;
+    });
 
-      if (novaQtd < 1) return; // Impede que a quantidade vá para 0 ou negativa
+    setProdutosComandaDetalhes(updatedProducts);
 
-      await axios.put(`http://192.168.3.29:4005/produtoscomanda/${idProdutoComanda}`, {
-        itemqtdade: novaQtd,
-      });
+    const newTotal = updatedProducts.reduce(
+      (sum, item) => sum + item.itemqtdade * parseFloat(item.valorproduto || '0'),
+      0
+    );
+    setComandaInfo((prev) => ({ ...prev, valorcomanda: newTotal }));
+  };
 
-      // Atualizar a lista localmente
-      setProdutosComanda((prev) =>
-        prev.map((produto) =>
-          produto.idprodcomanda === idProdutoComanda ? { ...produto, itemqtdade: novaQtd } : produto
-        )
-      );
+  const handleSave = async () => {
+    try {
+      for (const product of produtosComandaDetalhes) {
+        await axios.put(`${URL}/produtoscomanda/${product.idprodcomanda}`, {
+          itemqtdade: product.itemqtdade,
+        });
+      }
+      Alert.alert('Sucesso', 'Alterações salvas com sucesso!');
+      router.dismissAll();
     } catch (error) {
-      Alert.alert('Erro', 'Não foi possível atualizar a quantidade do produto');
+      Alert.alert('Erro', 'Não foi possível salvar as alterações.');
       console.error(error);
     }
   };
 
-  const renderProduto = ({ item }: { item: ProdutoComanda }) => (
-    <View style={styles.card}>
-      <Text style={styles.cardText}>{item.nomeproduto}</Text>
-      <Text style={styles.cardInfo}>Preço: R$ {item.valorproduto.toFixed(2)}</Text>
-      <Text style={styles.cardInfo}>Quantidade: {item.itemqtdade}</Text>
-      <View style={styles.buttonsContainer}>
-        <TouchableOpacity
-          style={[styles.button, styles.buttonSubtrair]}
-          onPress={() => atualizarQuantidade(item.idprodcomanda, 'decrementar')}
-        >
-          <Text style={styles.buttonText}>-</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[styles.button, styles.buttonAdicionar]}
-          onPress={() => atualizarQuantidade(item.idprodcomanda, 'incrementar')}
-        >
-          <Text style={styles.buttonText}>+</Text>
-        </TouchableOpacity>
-      </View>
-    </View>
-  );
-
   return (
     <View style={styles.container}>
-      {/* Informações da Comanda */}
-      <View style={styles.comandaInfo}>
-        <Text style={styles.comandaName}>{comandaInfo.nomecomanda}</Text>
-        <Text style={styles.comandaValue}>Valor Total: R$ {comandaInfo.valorcomanda.toFixed(2)}</Text>
+      <View style={styles.topBar}>
+        <Text style={styles.topBarText}>Comanda: {comandaInfo.nomecomanda}</Text>
       </View>
 
-      {/* Lista de Produtos */}
       <FlatList
-        data={produtosComanda}
+        data={produtosComandaDetalhes}
         keyExtractor={(item) => item.idprodcomanda.toString()}
-        renderItem={renderProduto}
-        contentContainerStyle={styles.lista}
+        renderItem={({ item }) => (
+          <View style={styles.card}>
+            <View style={styles.cardContent}>
+              <TouchableOpacity
+                style={styles.button}
+                onPress={() => updateQuantity(item.idprodcomanda, -1)}
+              >
+                <Text style={styles.buttonText}>-</Text>
+              </TouchableOpacity>
+
+              <View style={styles.cardInfo}>
+                <Text style={styles.cardText}>{item.nomeproduto || 'Desconhecido'}</Text>
+                <Text style={styles.cardText}>Qtd: {item.itemqtdade}</Text>
+                <Text style={styles.cardText}>
+                  R$ {parseFloat(item.valorproduto || '0').toFixed(2)}
+                </Text>
+              </View>
+
+              <TouchableOpacity
+                style={styles.button}
+                onPress={() => updateQuantity(item.idprodcomanda, 1)}
+              >
+                <Text style={styles.buttonText}>+</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        )}
+        ListEmptyComponent={<Text style={styles.emptyListText}>Nenhum produto encontrado nesta comanda.</Text>}
       />
+
+      <View style={styles.bottomBar}>
+        <Text style={styles.bottomBarText}>
+          Valor Total: R$ {comandaInfo.valorcomanda.toFixed(2)}
+        </Text>
+        <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
+          <Text style={styles.saveButtonText}>Salvar</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 };
@@ -115,65 +139,70 @@ const Pedido = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f4f4f4',
-    padding: 20,
   },
-  comandaInfo: {
-    marginBottom: 20,
-    backgroundColor: '#fff',
-    padding: 15,
-    borderRadius: 8,
-    elevation: 2,
+  topBar: {
+    backgroundColor: 'black',
+    padding: 10,
   },
-  comandaName: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginBottom: 5,
-  },
-  comandaValue: {
-    fontSize: 16,
-    color: '#555',
-  },
-  lista: {
-    paddingTop: 10,
-  },
-  card: {
-    backgroundColor: '#fff',
-    borderRadius: 8,
-    padding: 15,
-    marginBottom: 10,
-    elevation: 2,
-  },
-  cardText: {
+  topBarText: {
+    color: 'white',
     fontSize: 18,
     fontWeight: 'bold',
-    marginBottom: 5,
+  },
+  card: {
+    backgroundColor: '#f9f9f9',
+    borderRadius: 8,
+    padding: 15,
+    marginVertical: 8,
+    marginHorizontal: 10,
+    elevation: 3,
+  },
+  cardContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
   },
   cardInfo: {
-    fontSize: 14,
-    color: '#555',
+    alignItems: 'center',
   },
-  buttonsContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginTop: 10,
+  cardText: {
+    fontSize: 16,
   },
   button: {
-    width: 40,
-    height: 40,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderRadius: 20,
-  },
-  buttonSubtrair: {
-    backgroundColor: '#FF6347',
-  },
-  buttonAdicionar: {
-    backgroundColor: '#32CD32',
+    backgroundColor: 'black',
+    padding: 10,
+    borderRadius: 5,
   },
   buttonText: {
-    color: '#fff',
+    color: 'white',
+    fontSize: 18,
+  },
+  bottomBar: {
+    backgroundColor: 'black',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 15,
+  },
+  bottomBarText: {
+    color: 'white',
+    fontSize: 18,
     fontWeight: 'bold',
+  },
+  saveButton: {
+    backgroundColor: '#28A745',
+    padding: 10,
+    borderRadius: 5,
+  },
+  saveButtonText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  emptyListText: {
+    textAlign: 'center',
+    fontSize: 16,
+    marginTop: 20,
   },
 });
 

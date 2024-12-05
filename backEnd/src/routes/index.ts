@@ -110,5 +110,6 @@ router.get("/produtoscomanda/:id", (req: Request, res: Response) => {
 router.post("/produtoscomanda", ProdutosComandaController.createNewProdutoComanda);
 router.put("/produtoscomanda/:id", ProdutosComandaController.updateProdutoComanda);
 router.delete("/produtoscomanda/:id", ProdutosComandaController.deleteProdutoComanda);
+router.get("/produtoscomanda/detalhes/:idcomanda", ProdutosComandaController.findDetailsByComanda);
 
 export default router;

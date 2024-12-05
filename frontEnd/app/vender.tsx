@@ -10,15 +10,17 @@ export default function VenderScreen() {
   const [produtos, setProdutos] = useState<{ idproduto: number; nomeproduto: string; valorproduto: number; }[]>([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
 
+  const URL = 'http://192.168.3.29:4005';
+
   useEffect(() => {
     const fetchProdutos = async () => {
       try {
-        const response = await axios.get('http://192.168.3.29:4005/produtos');
+        const response = await axios.get(`${URL}/produtos`);
         const produtosData = response.data.map((produto: any) => ({
           idproduto: produto.idproduto,
           nomeproduto: produto.nomeproduto,
           valorproduto: parseFloat(produto.valorproduto),
-          imagem: produto.imagem.replace(/['"]+/g, ''), // Remover aspas adicionais na URL
+          imagem: { uri: produto.imagem },
         }));
         setProdutos(produtosData);
       } catch (error) {
@@ -64,7 +66,7 @@ export default function VenderScreen() {
     const quantidade = pedido.find((p) => p.idproduto === item.idproduto)?.quantidade || 0;
     return (
       <TouchableOpacity style={styles.card} onPress={() => adicionarAoPedido(item)}>
-        <Image source={{ uri: item.imagem }} style={styles.productImage} />
+        <Image source={{}} style={styles.productImage} />
         <Text style={styles.nome}>{item.nomeproduto}</Text>
         <Text style={styles.valor}>R$ {item.valorproduto.toFixed(2)}</Text>
         {quantidade > 0 && (

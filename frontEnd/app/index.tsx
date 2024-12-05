@@ -14,6 +14,7 @@ import { Image } from 'react-native';
 export default function LoginScreen() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const URL = 'http://192.168.3.29:4005';
 
   const handleLogin = async () => {
     if (!username || !password) {
@@ -22,7 +23,7 @@ export default function LoginScreen() {
     }
 
     try {
-      const response = await fetch(`http://192.168.3.29:4005/verificarLogin?usuario=${username}&senha=${password}`);
+      const response = await fetch(`${URL}/verificarLogin?usuario=${username}&senha=${password}`);
       const data = await response.json();
 
       if (response.ok && data.success) {
