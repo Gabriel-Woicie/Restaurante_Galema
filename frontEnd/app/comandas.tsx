@@ -1,46 +1,59 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, FlatList, Modal, TextInput } from 'react-native';
 import { usePedido } from '../context/PedidoContext';
 import { useRouter } from 'expo-router';
+import axios from 'axios';
 
 export default function ComandasScreen() {
   const { totalPrice } = usePedido();
   const router = useRouter();
 
-  const comandasMockadas = Array.from({ length: 50 }, (_, index) => ({
-    id: index + 1,
-    nome: `Mesa ${index + 1}`,
-  }));
-
-  const [comandas, setComandas] = useState(comandasMockadas);
+  const [comandas, setComandas] = useState<{ idcomanda: number; nomecomanda: string; situacaocomanda: boolean }[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [isCreateModalVisible, setIsCreateModalVisible] = useState(false);
   const [newComandaName, setNewComandaName] = useState('');
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [selectedComanda, setSelectedComanda] = useState<{ id: number; nome: string } | null>(null);
+  const [selectedComanda, setSelectedComanda] = useState<{ idcomanda: number; nomecomanda: string } | null>(null);
 
-  const ITEMS_PER_PAGE = 20;
+  const ITEMS_PER_PAGE = 10;
 
-  const currentData = comandas.slice(
-    (currentPage - 1) * ITEMS_PER_PAGE,
-    currentPage * ITEMS_PER_PAGE
-  );
+  useEffect(() => {
+    fetchComandas();
+  }, []);
 
-  const handleCreateComanda = () => {
-    if (newComandaName.trim()) {
-      const newComanda = { id: comandas.length + 1, nome: newComandaName.trim() };
-      setComandas([...comandas, newComanda]);
-      setNewComandaName('');
-      setIsCreateModalVisible(false);
-    } else {
-      alert('Insira um nome válido.');
+  const fetchComandas = async () => {
+    try {
+      const response = await axios.get('http://172.20.163.160:4005/comandas');
+      const activeComandas = response.data.filter((comanda: { situacaocomanda: boolean }) => comanda.situacaocomanda);
+      setComandas(activeComandas);
+    } catch (error) {
+      console.error('Error fetching comandas:', error);
     }
   };
 
-  const openModal = (comanda: { id: number; nome: string }) => {
+  const openModal = (comanda: { idcomanda: number; nomecomanda: string }) => {
     setSelectedComanda(comanda);
     setIsModalVisible(true);
   };
+
+  const handleCreateComanda = async () => {
+    try {
+      const newComanda = {
+        nomecomanda: newComandaName,
+        situacaocomanda: true,
+        valorcomanda: null,
+        idfuncionario: 1,
+      };
+      await axios.post('http://172.20.163.160:4005/comandas', newComanda);
+      setIsCreateModalVisible(false);
+      setNewComandaName('');
+      fetchComandas();
+    } catch (error) {
+      console.error('Error creating comanda:', error);
+    }
+  };
+
+  const currentData = comandas.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
 
   return (
     <View style={{ flex: 1, padding: 10 }}>
@@ -53,10 +66,11 @@ export default function ComandasScreen() {
 
       <FlatList
         data={currentData}
-        keyExtractor={(item) => item.id.toString()}
+        keyExtractor={(item) => item.idcomanda.toString()}
         renderItem={({ item }) => (
           <TouchableOpacity style={styles.card} onPress={() => openModal(item)}>
-            <Text style={styles.cardText}>{item.nome}</Text>
+            <Text style={styles.cardText}>{item.nomecomanda}</Text>
+            <Text style={styles.cardIdText}>#{item.idcomanda}</Text>
           </TouchableOpacity>
         )}
       />
@@ -78,7 +92,7 @@ export default function ComandasScreen() {
             currentPage === Math.ceil(comandas.length / ITEMS_PER_PAGE) && styles.disabledButton,
           ]}
         >
-          <Text style={styles.paginationText}>Próximo</Text>
+          <Text style={styles.paginationText}>Próxima</Text>
         </TouchableOpacity>
       </View>
 
@@ -115,7 +129,7 @@ export default function ComandasScreen() {
             <Text style={styles.modalTitle}>Registrar Pedido na Comanda</Text>
             {selectedComanda && (
               <>
-                <Text style={styles.modalText}>Comanda: {selectedComanda.nome}</Text>
+                <Text style={styles.modalText}>Comanda: {selectedComanda.nomecomanda}</Text>
                 <Text style={styles.modalText}>Total: R$ {totalPrice.toFixed(2)}</Text>
                 <TouchableOpacity style={styles.modalButton} onPress={() => setIsModalVisible(false)}>
                   <Text style={styles.modalButtonText}>Fechar</Text>
@@ -149,10 +163,17 @@ const styles = StyleSheet.create({
     padding: 15,
     alignItems: 'center',
     elevation: 2,
+    position: 'relative',
   },
   cardText: {
     fontSize: 16,
     fontWeight: 'bold',
+  },
+  cardIdText: {
+    position: 'absolute',
+    top: 5,
+    right: 10,
+    color: 'gray',
   },
   paginationContainer: {
     flexDirection: 'row',

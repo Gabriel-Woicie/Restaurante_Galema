@@ -1,35 +1,88 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, FlatList, Modal, Image } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, FlatList, Modal, Image, Alert } from 'react-native';
 
 export default function ProdutosScreen() {
-  // Dados mockados
-  const [produtos, setProdutos] = useState([
-    { id: 1, nome: 'Hambúrguer', descricao: 'Delicioso hambúrguer artesanal', categoria: true, valor: 25.5, imagem: '' },
-    { id: 2, nome: 'Cerveja', descricao: 'Cerveja artesanal', categoria: false, valor: 12.5, imagem: '' },
-    { id: 3, nome: 'Pizza', descricao: 'Pizza de calabresa', categoria: true, valor: 45.0, imagem: '' },
-    { id: 4, nome: 'Caipirinha', descricao: 'Caipirinha de limão', categoria: false, valor: 20.0, imagem: '' },
-    { id: 5, nome: 'Pasta', descricao: 'Massa italiana', categoria: true, valor: 35.0, imagem: '' },
-    { id: 6, nome: 'Coquetel', descricao: 'Coquetel tropical', categoria: false, valor: 22.0, imagem: '' },
-  ]);
-
+  const [produtos, setProdutos] = useState<{ id: number; nome: string; descricao: string; categoria: boolean; valor: number; imagem: string }[]>([]);
   const [pesquisa, setPesquisa] = useState('');
   const [paginaAtual, setPaginaAtual] = useState(1);
   const [itensPorPagina] = useState(30);
 
-  // Modais e estados
   const [isCriarModalVisible, setIsCriarModalVisible] = useState(false);
   const [isEditarModalVisible, setIsEditarModalVisible] = useState(false);
   const [isExcluirModalVisible, setIsExcluirModalVisible] = useState(false);
 
-  const [produtoSelecionado, setProdutoSelecionado] = useState<{ id: number; nome: string; descricao: string; categoria: boolean; valor: number; imagem: string } | null>(null);
+  const [produtoSelecionado, setProdutoSelecionado] = useState<{ idproduto: number; nomeproduto: string; descricao: string; categoria: boolean; valorproduto: number; imagem: string } | null>(null);
+  const [novoProduto, setNovoProduto] = useState({ nomeproduto: '', descricao: '', categoria: false, valorproduto: 0, imagem: '' });
 
-  // Filtrar produtos com base na pesquisa
+  // Fetch inicial para obter os produtos
+  const fetchProdutos = async () => {
+    try {
+      const response = await fetch('http://172.20.163.160:4005/produtos');
+      const data = await response.json();
+      const produtosFormatados = data.map((produto: any) => ({
+        id: produto.idproduto,
+        nome: produto.nomeproduto,
+        descricao: produto.descricao,
+        categoria: produto.categoria,
+        valor: parseFloat(produto.valorproduto),
+        imagem: produto.imagem.replace(/['"]+/g, ''), // Remover aspas adicionais na URL
+      }));
+      setProdutos(produtosFormatados);
+    } catch (error) {
+      Alert.alert('Erro', 'Não foi possível carregar os produtos.');
+    }
+  };
+
+  useEffect(() => {
+    fetchProdutos();
+  }, []);
+
+  // Função para lidar com a criação de produto
+  const criarProduto = async (novoProduto: { nomeproduto: string; descricao: string; categoria: boolean; valorproduto: number; imagem: string }) => {
+    try {
+      await fetch('http://172.20.163.160:4005/produtos', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(novoProduto),
+      });
+      Alert.alert('Sucesso', 'Produto criado com sucesso!');
+      setIsCriarModalVisible(false);
+    } catch (error) {
+      Alert.alert('Erro', 'Não foi possível criar o produto.');
+    }
+  };
+
+  // Função para abrir o modal de edição
+  const abrirEditarModal = (produto: any) => {
+    setProdutoSelecionado(produto);
+    setIsEditarModalVisible(true);
+  };
+
+  // Função para editar produto
+  const editarProduto = async () => {
+    try {
+      const response = await fetch(`http://172.20.163.160:4005/produtos/${produtoSelecionado?.idproduto}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(produtoSelecionado),
+      });
+      if (response.ok) {
+        fetchProdutos(); // Atualiza a lista
+        setIsEditarModalVisible(false);
+      } else {
+        console.error('Erro ao editar produto');
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+
+  // Filtro e paginação
   const produtosFiltrados = produtos.filter((produto) =>
     produto.nome.toLowerCase().includes(pesquisa.toLowerCase())
   );
-
-  // Paginação
   const totalPaginas = Math.ceil(produtosFiltrados.length / itensPorPagina);
   const produtosExibidos = produtosFiltrados.slice(
     (paginaAtual - 1) * itensPorPagina,
@@ -40,16 +93,24 @@ export default function ProdutosScreen() {
     if (novaPagina > 0 && novaPagina <= totalPaginas) setPaginaAtual(novaPagina);
   };
 
-  // Funções dos Modais
-  const abrirCriarModal = () => setIsCriarModalVisible(true);
-  const abrirEditarModal = (produto: { id: number; nome: string; descricao: string; categoria: boolean; valor: number; imagem: string }) => {
-    setProdutoSelecionado(produto);
-    setIsEditarModalVisible(true);
-  };
-  const abrirExcluirModal = (produto: { id: number; nome: string; descricao: string; categoria: boolean; valor: number; imagem: string }) => {
-    setProdutoSelecionado(produto);
-    setIsExcluirModalVisible(true);
-  };
+
+// Excluir Produto
+const excluirProduto = async () => {
+  try {
+    const response = await fetch(`http://172.20.163.160:4005/produtos/${produtoSelecionado?.idproduto}`, {
+      method: 'DELETE',
+    });
+    if (response.ok) {
+      fetchProdutos(); // Atualiza a lista
+      setIsExcluirModalVisible(false);
+    } else {
+      console.error('Erro ao excluir produto');
+    }
+  } catch (error) {
+    console.error(error);
+  }
+};
+
 
   return (
     <View style={styles.container}>
@@ -68,32 +129,30 @@ export default function ProdutosScreen() {
         keyExtractor={(item) => item.id.toString()}
         numColumns={2}
         renderItem={({ item }) => (
-            <View style={styles.productCard}>
-              {/* Ícone da categoria */}
-              <View style={styles.categoryIconContainer}>
-                {item.categoria ? (
-                  <Icon name="chef-hat" size={24} color="#000" /> // Ícone de cozinha
-                ) : (
-                  <Icon name="glass-cocktail" size={24} color="#000" /> // Ícone de drink
-                )}
-              </View>
-        
-              {/* Imagem e informações do produto */}
-              <Image source={{ uri: item.imagem }} style={styles.productImage} />
-              <Text style={styles.productName}>{item.nome}</Text>
-              <Text style={styles.productDescription}>{item.descricao}</Text>
-              
-              {/* Botões de ação */}
-              <View style={styles.cardActions}>
-                <TouchableOpacity style={styles.editButton} onPress={() => abrirEditarModal(item)}>
-                  <Text style={styles.secondaryButtonText}>Editar</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.deleteButton} onPress={() => abrirExcluirModal(item)}>
-                  <Text style={styles.buttonText}>Remover</Text>
-                </TouchableOpacity>
-              </View>
+          <View style={styles.productCard}>
+            <View style={styles.categoryIconContainer}>
+              {item.categoria ? (
+                <Icon name="chef-hat" size={24} color="#000" />
+              ) : (
+                <Icon name="glass-cocktail" size={24} color="#000" />
+              )}
             </View>
-          )}
+            <Image source={{ uri: item.imagem }} style={styles.productImage} />
+            <Text style={styles.productName}>{item.nome}</Text>
+            <Text style={styles.productDescription}>{item.descricao}</Text>
+            <View style={styles.cardActions}>
+              <TouchableOpacity style={styles.editButton} onPress={() => abrirEditarModal(item)}>
+                <Text style={styles.secondaryButtonText}>Editar</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.deleteButton}
+                onPress={() => abrirExcluirModal(item)}
+              >
+                <Text style={styles.buttonText}>Remover</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        )}
       />
 
       {/* Paginação */}
@@ -110,116 +169,138 @@ export default function ProdutosScreen() {
       </View>
 
       {/* Botão Criar Produto */}
-      <TouchableOpacity style={styles.createButton} onPress={abrirCriarModal}>
+      <TouchableOpacity style={styles.createButton} onPress={() => setIsCriarModalVisible(true)}>
         <Text style={styles.createButtonText}>+</Text>
       </TouchableOpacity>
 
       {/* Modal Criar Produto */}
-      <Modal visible={isCriarModalVisible} transparent animationType="slide">
-        <View style={styles.modalBackground}>
-          <View style={styles.modalContainer}>
-            <Text style={styles.modalTitle}>Criar Produto</Text>
-            {/* Campos para criar produto */}
-            <TextInput style={styles.input} placeholder="Nome" />
-            <TextInput style={styles.input} placeholder="Descrição" />
-            <TextInput style={styles.input} placeholder="Categoria (true ou false)" />
-            <TextInput style={styles.input} placeholder="Valor" keyboardType="numeric" />
-            <TextInput style={styles.input} placeholder="Endereço da Imagem" />
-            <View style={styles.modalActions}>
-              <TouchableOpacity
-                style={styles.modalButton}
-                onPress={() => setIsCriarModalVisible(false)}
-              >
-                <Text style={styles.modalButtonTextSecondary}>Salvar</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[styles.modalButton, styles.cancelButton]}
-                onPress={() => setIsCriarModalVisible(false)}
-              >
-                <Text style={styles.modalButtonText}>Cancelar</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </View>
-      </Modal>
+<Modal visible={isCriarModalVisible} transparent animationType="slide">
+  <View style={styles.modalBackground}>
+    <View style={styles.modalContainer}>
+      <Text style={styles.modalTitle}>Criar Produto</Text>
+      <TextInput
+        style={styles.input}
+        placeholder="Nome do Produto"
+        value={novoProduto.nomeproduto}
+        onChangeText={(text) => setNovoProduto({ ...novoProduto, nomeproduto: text })}
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="Descrição"
+        value={novoProduto.descricao}
+        onChangeText={(text) => setNovoProduto({ ...novoProduto, descricao: text })}
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="Categoria (true ou false)"
+        value={String(novoProduto.categoria)}
+        onChangeText={(text) => setNovoProduto({ ...novoProduto, categoria: text === 'true' })}
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="Valor"
+        keyboardType="numeric"
+        value={String(novoProduto.valorproduto)}
+        onChangeText={(text) => setNovoProduto({ ...novoProduto, valorproduto: parseFloat(text) })}
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="Endereço da Imagem"
+        value={novoProduto.imagem}
+        onChangeText={(text) => setNovoProduto({ ...novoProduto, imagem: text })}
+      />
+      <View style={styles.modalActions}>
+        <TouchableOpacity style={styles.modalButton} onPress={() => criarProduto(novoProduto)}>
+          <Text style={styles.modalButtonTextSecondary}>Salvar</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.modalButton, styles.cancelButton]}
+          onPress={() => setIsCriarModalVisible(false)}
+        >
+          <Text style={styles.modalButtonText}>Cancelar</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
+  </View>
+</Modal>
 
-      {/* Modal Editar Produto */}
-      <Modal visible={isEditarModalVisible} transparent animationType="slide">
-        <View style={styles.modalBackground}>
-          <View style={styles.modalContainer}>
-            <Text style={styles.modalTitle}>Editar Produto</Text>
-            {/* Campos para editar produto */}
-            <TextInput
-              style={styles.input}
-              placeholder="Nome"
-              value={produtoSelecionado?.nome || ''}
-            />
-            <TextInput
-              style={styles.input}
-              placeholder="Descrição"
-              value={produtoSelecionado?.descricao || ''}
-            />
-            <TextInput
-              style={styles.input}
-              placeholder="Categoria (true ou false)"
-              value={produtoSelecionado?.categoria ? 'true' : 'false'}
-            />
-            <TextInput
-              style={styles.input}
-              placeholder="Valor"
-              value={produtoSelecionado?.valor.toString() || ''}
-            />
-            <TextInput
-              style={styles.input}
-              placeholder="Endereço da Imagem"
-              value={produtoSelecionado?.imagem || ''}
-            />
-            <View style={styles.modalActions}>
-              <TouchableOpacity
-                style={styles.modalButton}
-                onPress={() => setIsEditarModalVisible(false)}
-              >
-                <Text style={styles.modalButtonTextSecondary}>Salvar</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[styles.modalButton, styles.cancelButton]}
-                onPress={() => setIsEditarModalVisible(false)}
-              >
-                <Text style={styles.modalButtonText}>Cancelar</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </View>
-      </Modal>
+    {/* Modal Editar Produto */}
+<Modal visible={isEditarModalVisible} transparent animationType="slide">
+  <View style={styles.modalBackground}>
+    <View style={styles.modalContainer}>
+      <Text style={styles.modalTitle}>Editar Produto</Text>
+      <TextInput
+        style={styles.input}
+        placeholder="Nome do Produto"
+        value={produtoSelecionado?.nomeproduto || ''}
+        onChangeText={(text) => setProdutoSelecionado(produtoSelecionado ? { ...produtoSelecionado, nomeproduto: text } : null)}
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="Descrição"
+        value={produtoSelecionado?.descricao || ''}
+        onChangeText={(text) => setProdutoSelecionado(produtoSelecionado ? { ...produtoSelecionado, descricao: text } : null)}
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="Categoria (true ou false)"
+        value={produtoSelecionado?.categoria ? 'true' : 'false'}
+        onChangeText={(text) => setProdutoSelecionado(produtoSelecionado ? { ...produtoSelecionado, categoria: text === 'true' } : null)}
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="Valor"
+        keyboardType="numeric"
+        value={String(produtoSelecionado?.valorproduto || '')}
+        onChangeText={(text) =>
+          setProdutoSelecionado({ ...produtoSelecionado, valorproduto: parseFloat(text) })
+        }
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="Endereço da Imagem"
+        value={produtoSelecionado?.imagem || ''}
+        onChangeText={(text) => setProdutoSelecionado({ ...produtoSelecionado, imagem: text })}
+      />
+      <View style={styles.modalActions}>
+        <TouchableOpacity style={styles.modalButton} onPress={editarProduto}>
+          <Text style={styles.modalButtonTextSecondary}>Salvar</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.modalButton, styles.cancelButton]}
+          onPress={() => setIsEditarModalVisible(false)}
+        >
+          <Text style={styles.modalButtonText}>Cancelar</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
+  </View>
+</Modal>
 
-      {/* Modal Excluir Produto */}
-      <Modal visible={isExcluirModalVisible} transparent animationType="fade">
-        <View style={styles.modalBackground}>
-          <View style={styles.modalContainer}>
-            <Text style={styles.modalTitle}>Confirmação</Text>
-            <Text style={styles.modalText}>
-              Deseja realmente excluir o produto "{produtoSelecionado?.nome}"?
-            </Text>
-            <View style={styles.modalActions}>
-              <TouchableOpacity
-                style={styles.modalButton}
-                onPress={() => {
-                  setProdutos(produtos.filter((p) => p.id !== produtoSelecionado?.id));
-                  setIsExcluirModalVisible(false);
-                }}
-              >
-                <Text style={styles.modalButtonTextSecondary}>Sim</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[styles.modalButton, styles.cancelButton]}
-                onPress={() => setIsExcluirModalVisible(false)}
-              >
-                <Text style={styles.modalButtonText}>Não</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </View>
-      </Modal>
+    {/* Modal Excluir Produto */}
+<Modal visible={isExcluirModalVisible} transparent animationType="fade">
+  <View style={styles.modalBackground}>
+    <View style={styles.modalContainer}>
+      <Text style={styles.modalTitle}>Confirmação</Text>
+      <Text style={styles.modalText}>
+        Deseja realmente excluir o produto "{produtoSelecionado?.nomeproduto}"?
+      </Text>
+      <View style={styles.modalActions}>
+        <TouchableOpacity style={styles.modalButton} onPress={excluirProduto}>
+          <Text style={styles.modalButtonTextSecondary}>Sim</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.modalButton, styles.cancelButton]}
+          onPress={() => setIsExcluirModalVisible(false)}
+        >
+          <Text style={styles.modalButtonText}>Não</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
+  </View>
+</Modal>
+
+
     </View>
   );
 }
